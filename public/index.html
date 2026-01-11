@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Manager - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--light:#f8f9fa;--dark:#212529;--gray:#6c757d;--border-radius:12px;--box-shadow:0 10px 30px rgba(0,0,0,0.1);--transition:all 0.3s ease}
+        body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .login-container{width:100%;max-width:420px}
+        .login-card{background:white;border-radius:var(--border-radius);padding:40px;box-shadow:var(--box-shadow);animation:slideUp 0.5s ease-out}
+        .logo{text-align:center;margin-bottom:30px}
+        .logo i{font-size:3.5rem;color:var(--primary);margin-bottom:15px}
+        .logo h1{color:var(--dark);font-size:1.8rem}
+        .form-group{margin-bottom:20px}
+        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark)}
+        input{width:100%;padding:14px 16px;border:2px solid #e9ecef;border-radius:var(--border-radius);font-size:16px;transition:var(--transition)}
+        input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,0.2)}
+        .btn{width:100%;padding:14px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px}
+        .btn-primary{background-color:var(--primary);color:white;margin-top:10px}
+        .btn-primary:hover{background-color:var(--primary-dark);transform:translateY(-2px)}
+        .role-selector{display:flex;gap:10px;margin-bottom:25px}
+        .role-btn{flex:1;padding:12px;border:2px solid #e9ecef;background:white;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center}
+        .role-btn.active{border-color:var(--primary);background-color:rgba(67,97,238,0.1);color:var(--primary)}
+        .error-message{background-color:#fee;color:var(--danger);padding:12px;border-radius:var(--border-radius);margin-top:20px;text-align:center;display:none}
+        .demo-credentials{margin-top:25px;padding:15px;background-color:#f8f9fa;border-radius:var(--border-radius);font-size:0.9rem}
+        .demo-credentials h4{margin-bottom:10px;color:var(--gray)}
+        .demo-credentials p{margin-bottom:5px}
+        @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        @media (max-width:480px){.login-card{padding:30px 20px}}
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <i class="fas fa-lock"></i>
+                <h1>Account Manager</h1>
+                <p style="color:var(--gray);margin-top:10px">Secure Account Management</p>
+            </div>
+
+            <div class="role-selector">
+                <button type="button" class="role-btn active" id="userBtn">
+                    <i class="fas fa-user"></i> User
+                </button>
+                <button type="button" class="role-btn" id="adminBtn">
+                    <i class="fas fa-crown"></i> Admin
+                </button>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group" id="usernameField">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-key"></i> Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Masuk sebagai User
+                </button>
+            </form>
+
+            <div class="error-message" id="errorMessage">
+                Username atau password salah!
+            </div>
+
+            <div class="demo-credentials">
+                <h4><i class="fas fa-info-circle"></i> Kredensial:</h4>
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>User:</strong> [apa saja] / 1</p>
+                <p style="font-size:0.8rem;color:var(--gray);margin-top:10px">User tidak perlu username, cukup password: 1</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userBtn = document.getElementById('userBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const usernameField = document.getElementById('usernameField');
+        const usernameInput = document.getElementById('username');
+        const errorMessage = document.getElementById('errorMessage');
+        let currentRole = 'user';
+
+        userBtn.addEventListener('click', () => {
+            userBtn.classList.add('active');
+            adminBtn.classList.remove('active');
+            currentRole = 'user';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk sebagai User';
+            usernameField.style.display = 'block';
+            usernameInput.required = false;
+        });
+
+        adminBtn.addEventListener('click', () => {
+            adminBtn.classList.add('active');
+            userBtn.classList.remove('active');
+            currentRole = 'admin';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk sebagai Admin';
+            usernameField.style.display = 'block';
+            usernameInput.required = true;
+        });
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, password, role: currentRole })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('userRole', data.role);
+                    localStorage.setItem('username', data.username);
+                    
+                    if (data.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'user.html';
+                    }
+                } else {
+                    errorMessage.textContent = data.error || 'Login failed';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Network error';
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        usernameInput.addEventListener('input', () => {
+            errorMessage.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
