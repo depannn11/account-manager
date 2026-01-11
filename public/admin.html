@@ -160,10 +160,6 @@
                     <i class="fas fa-chart-bar"></i>
                     <span>Statistik</span>
                 </a>
-                <a href="#" class="menu-item" data-section="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
             </div>
         </div>
 
@@ -293,10 +289,19 @@
                                     <input type="text" id="customPrefix" placeholder="AMP" maxlength="6">
                                     <small style="color:var(--gray);font-size:0.8rem">Contoh: AMP-UWGSG1726</small>
                                 </div>
-                                <button type="submit" class="btn btn-success">
+                                <button type="submit" class="btn btn-success" id="generateSingleBtn">
                                     <i class="fas fa-bolt"></i> Generate Kode
                                 </button>
                             </form>
+                            <div id="singleCodeResult" style="margin-top:20px;display:none">
+                                <div style="padding:15px;background:var(--light);border-radius:var(--border-radius);border-left:4px solid var(--success)">
+                                    <h4 style="margin:0 0 10px 0;color:var(--success)"><i class="fas fa-check-circle"></i> Kode Berhasil Dibuat!</h4>
+                                    <div style="font-family:monospace;font-size:1.2rem;font-weight:bold;padding:10px;background:white;border-radius:var(--border-radius);margin-bottom:10px" id="generatedCode"></div>
+                                    <button class="btn btn-primary" onclick="copyGeneratedCode()">
+                                        <i class="fas fa-copy"></i> Salin Kode
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="card">
                             <div class="card-header">
@@ -317,10 +322,19 @@
                                     <label>Custom Prefix (opsional)</label>
                                     <input type="text" id="multipleCustomPrefix" placeholder="AMP" maxlength="6">
                                 </div>
-                                <button type="submit" class="btn btn-warning">
+                                <button type="submit" class="btn btn-warning" id="generateMultipleBtn">
                                     <i class="fas fa-bolt"></i> Generate Multiple
                                 </button>
                             </form>
+                            <div id="multipleCodeResult" style="margin-top:20px;display:none">
+                                <div style="padding:15px;background:var(--light);border-radius:var(--border-radius);border-left:4px solid var(--warning)">
+                                    <h4 style="margin:0 0 10px 0;color:var(--warning)"><i class="fas fa-check-circle"></i> Kode Berhasil Dibuat!</h4>
+                                    <div style="max-height:200px;overflow-y:auto;padding:10px;background:white;border-radius:var(--border-radius);font-family:monospace;font-size:0.9rem" id="generatedCodesList"></div>
+                                    <button class="btn btn-primary" onclick="copyAllCodes()" style="margin-top:10px">
+                                        <i class="fas fa-copy"></i> Salin Semua Kode
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -381,40 +395,6 @@
                             <div class="stat-card">
                                 <div class="stat-value" id="usedAccounts">0</div>
                                 <div class="stat-label">Akun Terpakai</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" id="settingsSection">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-cog"></i> Pengaturan</h2>
-                    </div>
-                    <div class="grid-2">
-                        <div>
-                            <h3 style="margin-bottom:20px;color:var(--primary)"><i class="fas fa-user-cog"></i> Admin Settings</h3>
-                            <div class="form-group">
-                                <label>Username Admin</label>
-                                <input type="text" value="admin" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label>Password User Default</label>
-                                <input type="text" value="1" disabled>
-                            </div>
-                            <button class="btn btn-primary" onclick="showNotification('Settings saved!', 'success')">
-                                <i class="fas fa-save"></i> Simpan Pengaturan
-                            </button>
-                        </div>
-                        <div>
-                            <h3 style="margin-bottom:20px;color:var(--primary)"><i class="fas fa-info-circle"></i> System Info</h3>
-                            <div style="background:var(--light);padding:20px;border-radius:var(--border-radius)">
-                                <p><strong>Versi:</strong> 2.0.0</p>
-                                <p><strong>Database:</strong> SQLite</p>
-                                <p><strong>Status:</strong> <span class="badge success">Online</span></p>
-                                <p><strong>Server:</strong> Vercel</p>
-                                <p><strong>API Endpoints:</strong> Active</p>
                             </div>
                         </div>
                     </div>
@@ -531,13 +511,6 @@ user3@example.com|pass789|Google" required></textarea>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // ============ GLOBAL VARIABLES ============
-        let products = [];
-        let currentProductId = null;
-        let chart = null;
-        let currentTab = 'generate';
-
-        // ============ INITIALIZATION ============
         document.addEventListener('DOMContentLoaded', function() {
             const userRole = localStorage.getItem('userRole');
             if (!userRole || userRole !== 'admin') {
@@ -548,19 +521,36 @@ user3@example.com|pass789|Google" required></textarea>
             const adminName = localStorage.getItem('userName') || 'Administrator';
             document.getElementById('adminName').textContent = adminName;
 
-            initializeEventListeners();
-            loadInitialData();
+            initApp();
         });
 
-        // ============ EVENT LISTENERS ============
-        function initializeEventListeners() {
-            // Navigation
-            document.getElementById('logoutBtn').addEventListener('click', logout);
+        let products = [];
+        let currentProductId = null;
+        let chart = null;
+        let currentTab = 'generate';
+        let lastGeneratedCode = '';
+        let lastGeneratedCodes = [];
+
+        function initApp() {
+            setupEventListeners();
+            loadDashboard();
+            loadProducts();
+            loadMessages();
+            
+            setInterval(loadDashboard, 30000);
+            setInterval(loadMessages, 15000);
+        }
+
+        function setupEventListeners() {
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            });
+
             document.getElementById('burgerMenu').addEventListener('click', toggleSidebar);
             document.getElementById('overlay').addEventListener('click', closeSidebar);
             document.getElementById('notificationBtn').addEventListener('click', () => switchSection('chat'));
 
-            // Menu items
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -569,7 +559,6 @@ user3@example.com|pass789|Google" required></textarea>
                 });
             });
 
-            // Tab navigation
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tab = this.getAttribute('data-tab');
@@ -577,39 +566,32 @@ user3@example.com|pass789|Google" required></textarea>
                 });
             });
 
-            // Product management
             document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
             document.getElementById('closeProductModal').addEventListener('click', closeProductModal);
             document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
 
-            // Account management
             document.getElementById('addAccountBtn').addEventListener('click', () => openAccountModal());
             document.getElementById('closeAccountModal').addEventListener('click', closeAccountModal);
             document.getElementById('accountForm').addEventListener('submit', handleAccountSubmit);
             document.getElementById('productSelect').addEventListener('change', handleProductSelectChange);
             
-            // Import accounts
             document.getElementById('importAccountsBtn').addEventListener('click', openImportModal);
             document.getElementById('closeImportModal').addEventListener('click', closeImportModal);
             document.getElementById('importForm').addEventListener('submit', handleImportSubmit);
 
-            // Code generation
             document.getElementById('codeProductSelect').addEventListener('change', handleCodeProductSelectChange);
             document.getElementById('viewCodeProductSelect').addEventListener('change', handleViewCodeProductSelectChange);
             document.getElementById('generateCodeForm').addEventListener('submit', handleGenerateCodeSubmit);
             document.getElementById('generateMultipleForm').addEventListener('submit', handleGenerateMultipleSubmit);
 
-            // Chat
             document.getElementById('chatForm').addEventListener('submit', handleChatSubmit);
 
-            // Quick actions
             document.getElementById('quickAddProduct').addEventListener('click', () => openProductModal());
             document.getElementById('quickAddAccount').addEventListener('click', () => openAccountModal());
             document.getElementById('quickGenerateCode').addEventListener('click', () => switchSection('codes'));
             document.getElementById('quickCheckMessages').addEventListener('click', () => switchSection('chat'));
         }
 
-        // ============ NAVIGATION ============
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
@@ -631,30 +613,20 @@ user3@example.com|pass789|Google" required></textarea>
         }
 
         function switchSection(sectionId) {
-            // Hide all sections
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             
-            // Show selected section
             const sectionElement = document.getElementById(sectionId + 'Section');
             if (sectionElement) {
                 sectionElement.classList.add('active');
                 document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
                 
-                // Load section data
-                if (sectionId === 'dashboard') {
-                    loadDashboard();
-                } else if (sectionId === 'products') {
-                    loadProducts();
-                } else if (sectionId === 'accounts') {
-                    loadAccounts(currentProductId);
-                } else if (sectionId === 'codes') {
-                    loadCodes(currentProductId);
-                } else if (sectionId === 'chat') {
-                    loadMessages();
-                } else if (sectionId === 'stats') {
-                    loadStats();
-                }
+                if (sectionId === 'dashboard') loadDashboard();
+                else if (sectionId === 'products') loadProducts();
+                else if (sectionId === 'accounts') loadAccounts(currentProductId);
+                else if (sectionId === 'codes') loadCodes(currentProductId);
+                else if (sectionId === 'chat') loadMessages();
+                else if (sectionId === 'stats') loadStats();
             }
             
             closeSidebar();
@@ -673,15 +645,15 @@ user3@example.com|pass789|Google" required></textarea>
             }
         }
 
-        // ============ LOAD DATA FUNCTIONS ============
-        function loadInitialData() {
-            loadDashboard();
-            loadProducts();
-            loadMessages();
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'flex';
             
-            // Auto refresh every 30 seconds
-            setInterval(loadDashboard, 30000);
-            setInterval(loadMessages, 15000);
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
         }
 
         async function loadDashboard() {
@@ -700,24 +672,20 @@ user3@example.com|pass789|Google" required></textarea>
                 const statsData = await statsRes.json();
                 const messagesData = await messagesRes.json();
                 
-                // Update stats
                 document.getElementById('totalProducts').textContent = statsData.products || 0;
                 document.getElementById('totalAccounts').textContent = statsData.totalAccounts || 0;
                 document.getElementById('availableAccounts').textContent = statsData.availableAccounts || 0;
                 document.getElementById('totalCodes').textContent = statsData.totalCodes || 0;
                 
-                // Update notifications
                 const unreadCount = messagesData.count || 0;
                 document.getElementById('unreadCount').textContent = unreadCount;
                 document.getElementById('chatBadge').textContent = unreadCount;
                 document.getElementById('chatBadge').style.display = unreadCount > 0 ? 'inline-block' : 'none';
                 
-                // Update recent activity
                 updateRecentActivity(productsData);
                 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                showNotification('Gagal memuat dashboard', 'error');
             }
         }
 
@@ -755,9 +723,7 @@ user3@example.com|pass789|Google" required></textarea>
         async function loadProducts() {
             try {
                 const response = await fetch('/api/products');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch products');
-                }
+                if (!response.ok) throw new Error('Failed to fetch products');
                 
                 products = await response.json();
                 updateProductSelects();
@@ -766,7 +732,7 @@ user3@example.com|pass789|Google" required></textarea>
             } catch (error) {
                 console.error('Error loading products:', error);
                 showNotification('Gagal memuat produk', 'error');
-                renderProducts(); // Render empty state
+                renderProducts();
             }
         }
 
@@ -825,21 +791,9 @@ user3@example.com|pass789|Google" required></textarea>
                         <td><strong>${product.product_code}</strong></td>
                         <td><i class="${product.logo || 'fas fa-box'}"></i> ${product.name}</td>
                         <td>${product.description || '-'}</td>
-                        <td>
-                            <span class="badge ${product.stock > 0 ? 'success' : 'danger'}">
-                                ${product.stock}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge ${product.available_accounts > 0 ? 'success' : 'warning'}">
-                                ${product.available_accounts || 0}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge info">
-                                ${product.total_accounts || 0}
-                            </span>
-                        </td>
+                        <td><span class="badge ${product.stock > 0 ? 'success' : 'danger'}">${product.stock}</span></td>
+                        <td><span class="badge ${product.available_accounts > 0 ? 'success' : 'warning'}">${product.available_accounts || 0}</span></td>
+                        <td><span class="badge info">${product.total_accounts || 0}</span></td>
                         <td>
                             <button class="btn btn-success" style="padding:5px 10px;font-size:0.8rem" onclick="editProduct(${product.id})">
                                 <i class="fas fa-edit"></i>
@@ -872,9 +826,7 @@ user3@example.com|pass789|Google" required></textarea>
 
             try {
                 const response = await fetch(`/api/products/${productId}/accounts`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch accounts');
-                }
+                if (!response.ok) throw new Error('Failed to fetch accounts');
                 
                 const accounts = await response.json();
                 
@@ -981,9 +933,7 @@ user3@example.com|pass789|Google" required></textarea>
 
             try {
                 const response = await fetch(`/api/codes/${productId}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch codes');
-                }
+                if (!response.ok) throw new Error('Failed to fetch codes');
                 
                 const codes = await response.json();
                 
@@ -1096,7 +1046,6 @@ user3@example.com|pass789|Google" required></textarea>
                 document.getElementById('availableCodes').textContent = (stats.totalCodes || 0) - (stats.usedCodes || 0);
                 document.getElementById('usedAccounts').textContent = (stats.totalAccounts || 0) - (stats.availableAccounts || 0);
                 
-                // Create chart
                 if (chart) chart.destroy();
                 
                 const ctx = document.getElementById('statsChart');
@@ -1138,7 +1087,6 @@ user3@example.com|pass789|Google" required></textarea>
             }
         }
 
-        // ============ EVENT HANDLERS ============
         function handleProductSelectChange(e) {
             currentProductId = e.target.value;
             loadAccounts(currentProductId);
@@ -1168,14 +1116,12 @@ user3@example.com|pass789|Google" required></textarea>
             try {
                 let response;
                 if (productId) {
-                    // Update existing product
                     response = await fetch(`/api/products/${productId}`, {
                         method: 'PUT',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(productData)
                     });
                 } else {
-                    // Create new product
                     response = await fetch('/api/products', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -1183,9 +1129,7 @@ user3@example.com|pass789|Google" required></textarea>
                     });
                 }
                 
-                if (!response.ok) {
-                    throw new Error('Failed to save product');
-                }
+                if (!response.ok) throw new Error('Failed to save product');
                 
                 const data = await response.json();
                 if (data.success) {
@@ -1219,9 +1163,7 @@ user3@example.com|pass789|Google" required></textarea>
                     body: JSON.stringify(accountData)
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Failed to save account');
-                }
+                if (!response.ok) throw new Error('Failed to save account');
                 
                 const data = await response.json();
                 if (data.success) {
@@ -1256,9 +1198,7 @@ user3@example.com|pass789|Google" required></textarea>
                     body: JSON.stringify({ product_id: productId, text })
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Failed to import accounts');
-                }
+                if (!response.ok) throw new Error('Failed to import accounts');
                 
                 const data = await response.json();
                 if (data.success) {
@@ -1287,6 +1227,11 @@ user3@example.com|pass789|Google" required></textarea>
                 return;
             }
             
+            const btn = document.getElementById('generateSingleBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            btn.disabled = true;
+            
             try {
                 const response = await fetch('/api/codes/generate', {
                     method: 'POST',
@@ -1299,29 +1244,29 @@ user3@example.com|pass789|Google" required></textarea>
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to generate code');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate code');
                 }
                 
                 const data = await response.json();
                 if (data.success) {
-                    showNotification(`Kode berhasil digenerate: ${data.code}`, 'success');
+                    lastGeneratedCode = data.code;
+                    document.getElementById('generatedCode').textContent = data.code;
+                    document.getElementById('singleCodeResult').style.display = 'block';
                     
-                    // Reset form
-                    document.getElementById('accountSelect').innerHTML = '<option value="">Pilih Akun</option>';
+                    showNotification('Kode berhasil digenerate!', 'success');
                     
-                    // Load updated data
                     loadCodes(productId);
                     loadDashboard();
-                    
-                    // Ask to copy code
-                    if (confirm(`Kode: ${data.code}\n\nSalin ke clipboard?`)) {
-                        copyToClipboard(data.code);
-                    }
+                    loadAvailableAccounts(productId);
                 }
                 
             } catch (error) {
                 console.error('Error generating code:', error);
-                showNotification('Gagal generate kode', 'error');
+                showNotification(error.message || 'Gagal generate kode', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 
@@ -1342,6 +1287,11 @@ user3@example.com|pass789|Google" required></textarea>
                 return;
             }
             
+            const btn = document.getElementById('generateMultipleBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            btn.disabled = true;
+            
             try {
                 const response = await fetch('/api/codes/generate-multiple', {
                     method: 'POST',
@@ -1354,27 +1304,29 @@ user3@example.com|pass789|Google" required></textarea>
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Failed to generate codes');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate codes');
                 }
                 
                 const data = await response.json();
                 if (data.success) {
-                    showNotification(`${count} kode berhasil digenerate`, 'success');
+                    lastGeneratedCodes = data.codes || [];
+                    const codesList = lastGeneratedCodes.map(c => c.code).join('\n');
+                    document.getElementById('generatedCodesList').textContent = codesList;
+                    document.getElementById('multipleCodeResult').style.display = 'block';
                     
-                    // Load updated data
+                    showNotification(`${count} kode berhasil digenerate!`, 'success');
+                    
                     loadCodes(productId);
                     loadDashboard();
-                    
-                    // Show codes list
-                    const codesList = data.codes.map(c => c.code).join('\n');
-                    if (confirm(`${count} kode berhasil digenerate!\n\nTampilkan daftar kode?`)) {
-                        alert('Kode yang digenerate:\n\n' + codesList);
-                    }
                 }
                 
             } catch (error) {
                 console.error('Error generating multiple codes:', error);
-                showNotification('Gagal generate kode', 'error');
+                showNotification(error.message || 'Gagal generate kode', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 
@@ -1399,9 +1351,7 @@ user3@example.com|pass789|Google" required></textarea>
                     })
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Failed to send message');
-                }
+                if (!response.ok) throw new Error('Failed to send message');
                 
                 const data = await response.json();
                 if (data.success) {
@@ -1416,7 +1366,6 @@ user3@example.com|pass789|Google" required></textarea>
             }
         }
 
-        // ============ MODAL FUNCTIONS ============
         function openProductModal(productId = null) {
             const modal = document.getElementById('productModal');
             const title = document.getElementById('modalTitle');
@@ -1476,7 +1425,6 @@ user3@example.com|pass789|Google" required></textarea>
             document.getElementById('importForm').reset();
         }
 
-        // ============ CRUD OPERATIONS ============
         function editProduct(id) {
             openProductModal(id);
         }
@@ -1489,9 +1437,7 @@ user3@example.com|pass789|Google" required></textarea>
                     method: 'DELETE'
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Failed to delete product');
-                }
+                if (!response.ok) throw new Error('Failed to delete product');
                 
                 const data = await response.json();
                 if (data.success) {
@@ -1499,7 +1445,6 @@ user3@example.com|pass789|Google" required></textarea>
                     loadProducts();
                     loadDashboard();
                     
-                    // Reset current product if deleted
                     if (currentProductId === id) {
                         currentProductId = null;
                         document.getElementById('productSelect').value = '';
@@ -1521,9 +1466,7 @@ user3@example.com|pass789|Google" required></textarea>
                     method: 'DELETE'
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Failed to delete account');
-                }
+                if (!response.ok) throw new Error('Failed to delete account');
                 
                 const data = await response.json();
                 if (data.success) {
@@ -1539,20 +1482,6 @@ user3@example.com|pass789|Google" required></textarea>
             }
         }
 
-        // ============ UTILITY FUNCTIONS ============
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            if (!notification) return;
-            
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'flex';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 showNotification('Kode disalin!', 'success');
@@ -1562,18 +1491,27 @@ user3@example.com|pass789|Google" required></textarea>
             });
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
+        function copyGeneratedCode() {
+            if (lastGeneratedCode) {
+                copyToClipboard(lastGeneratedCode);
+            }
         }
 
-        // ============ GLOBAL FUNCTIONS (for onclick attributes) ============
+        function copyAllCodes() {
+            if (lastGeneratedCodes.length > 0) {
+                const allCodes = lastGeneratedCodes.map(c => c.code).join('\n');
+                copyToClipboard(allCodes);
+            }
+        }
+
         window.editProduct = editProduct;
         window.deleteProduct = deleteProduct;
         window.deleteAccount = deleteAccount;
         window.copyToClipboard = copyToClipboard;
         window.openProductModal = openProductModal;
         window.openAccountModal = openAccountModal;
+        window.copyGeneratedCode = copyGeneratedCode;
+        window.copyAllCodes = copyAllCodes;
 
     </script>
 </body>
