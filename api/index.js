@@ -73,35 +73,38 @@ const dbRun = (sql, params = []) => {
   });
 };
 
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'admin123';
-const USER_PASSWORD = '1';
-
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password, role } = req.body;
+    
+    console.log('Login attempt:', { username, password, role });
 
     if (role === 'admin') {
-      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      if (username === 'admin' && password === 'admin123') {
+        console.log('Admin login successful');
         return res.json({
           success: true,
           role: 'admin',
           username: 'admin'
         });
       }
+      console.log('Admin login failed');
       return res.status(401).json({ error: 'Invalid admin credentials' });
     } else {
-      if (password === USER_PASSWORD) {
+      if (password === '1') {
+        console.log('User login successful');
         return res.json({
           success: true,
           role: 'user',
           username: username || 'user'
         });
       }
-      return res.status(401).json({ error: 'Invalid password' });
+      console.log('User login failed');
+      return res.status(401).json({ error: 'Invalid password. Use password: 1' });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -116,6 +119,7 @@ app.get('/api/products', async (req, res) => {
     `);
     res.json(products);
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -134,6 +138,7 @@ app.post('/api/products', async (req, res) => {
       productId: result.id 
     });
   } catch (error) {
+    console.error('Error adding product:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -149,6 +154,7 @@ app.put('/api/products/:id', async (req, res) => {
     
     res.json({ success: true });
   } catch (error) {
+    console.error('Error updating product:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -158,6 +164,7 @@ app.delete('/api/products/:id', async (req, res) => {
     await dbRun('DELETE FROM products WHERE id = ?', [req.params.id]);
     res.json({ success: true });
   } catch (error) {
+    console.error('Error deleting product:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -165,12 +172,15 @@ app.delete('/api/products/:id', async (req, res) => {
 app.get('/api/products/:id/accounts', async (req, res) => {
   try {
     const accounts = await dbAll(
-      `SELECT a.* FROM accounts a WHERE a.product_id = ? ORDER BY a.status, a.id`,
+      `SELECT a.* FROM accounts a 
+       WHERE a.product_id = ? 
+       ORDER BY a.status, a.id`,
       [req.params.id]
     );
     
     res.json(accounts);
   } catch (error) {
+    console.error('Error fetching accounts:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -191,6 +201,7 @@ app.post('/api/accounts', async (req, res) => {
       accountId: result.id 
     });
   } catch (error) {
+    console.error('Error adding account:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -207,6 +218,7 @@ app.delete('/api/accounts/:id', async (req, res) => {
     
     res.json({ success: true });
   } catch (error) {
+    console.error('Error deleting account:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -236,6 +248,7 @@ app.post('/api/codes/generate', async (req, res) => {
       codes: generatedCodes 
     });
   } catch (error) {
+    console.error('Error generating codes:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -249,6 +262,7 @@ app.get('/api/codes/:product_id', async (req, res) => {
     
     res.json(codes);
   } catch (error) {
+    console.error('Error fetching codes:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -307,6 +321,7 @@ app.post('/api/redeem', async (req, res) => {
     }
     
   } catch (error) {
+    console.error('Error redeeming code:', error);
     res.status(500).json({ error: error.message });
   }
 });
