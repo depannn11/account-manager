@@ -3,36 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Manager - User</title>
+    <title>Account Manager - User Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--success:#4cc9f0;--light:#f8f9fa;--dark:#212529;--gray:#6c757d;--border-radius:12px;--box-shadow:0 10px 20px rgba(0,0,0,0.1);--transition:all 0.3s ease}
+        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--success:#4cc9f0;--danger:#f72585;--warning:#f8961e;--dark:#1a1a2e;--light:#f8f9fa;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 20px rgba(0,0,0,0.1);--transition:all 0.3s ease}
         body{background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh}
-        .navbar{background:white;padding:20px 30px;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center}
+        .navbar{background:white;padding:15px 30px;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
+        .navbar-left{display:flex;align-items:center;gap:20px}
+        .burger-menu{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:8px}
+        .burger-line{width:25px;height:3px;background:var(--dark);border-radius:2px;transition:var(--transition)}
         .navbar-brand{display:flex;align-items:center;gap:15px}
         .navbar-brand i{font-size:1.8rem;color:var(--primary)}
-        .navbar-brand h1{font-size:1.5rem;color:var(--dark)}
+        .navbar-brand h1{font-size:1.5rem;color:var(--dark);font-weight:700}
+        .user-info{display:flex;align-items:center;gap:15px}
+        .notification-badge{position:relative}
+        .notification-btn{background:none;border:none;font-size:1.3rem;color:var(--gray);cursor:pointer;padding:8px;position:relative}
+        .badge-count{position:absolute;top:0;right:0;background:var(--danger);color:white;font-size:0.7rem;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
         .logout-btn{background:var(--primary);color:white;border:none;padding:8px 20px;border-radius:var(--border-radius);cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600;transition:var(--transition)}
         .logout-btn:hover{background:var(--primary-dark);transform:translateY(-2px)}
-        .container{max-width:1200px;margin:0 auto;padding:30px}
-        .hero{text-align:center;margin-bottom:40px}
-        .hero h2{color:var(--primary);font-size:2.2rem;margin-bottom:15px}
-        .hero p{color:var(--gray);max-width:600px;margin:0 auto}
-        .main-content{display:grid;grid-template-columns:1fr 1fr;gap:30px}
-        @media(max-width:992px){.main-content{grid-template-columns:1fr}.container{padding:20px}}
-        .card{background:white;border-radius:var(--border-radius);padding:30px;box-shadow:var(--box-shadow)}
-        .card h3{margin-bottom:20px;color:var(--primary);display:flex;align-items:center;gap:10px}
-        .form-group{margin-bottom:20px}
-        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark)}
-        input,textarea{width:100%;padding:14px 16px;border:2px solid #e9ecef;border-radius:var(--border-radius);font-size:16px;transition:var(--transition)}
-        input:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,0.2)}
-        .btn{width:100%;padding:14px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px}
-        .btn-primary{background-color:var(--primary);color:white}
-        .btn-primary:hover{background-color:var(--primary-dark);transform:translateY(-2px)}
+        .container{display:flex;min-height:calc(100vh - 70px)}
+        .sidebar{width:280px;background:white;padding:25px 0;box-shadow:2px 0 10px rgba(0,0,0,0.1);transition:var(--transition)}
+        .sidebar-menu{padding:0 20px}
+        .menu-item{display:flex;align-items:center;gap:15px;padding:15px;margin-bottom:10px;border-radius:var(--border-radius);cursor:pointer;transition:var(--transition);color:var(--gray);text-decoration:none}
+        .menu-item:hover{background:var(--gray-light);color:var(--primary)}
+        .menu-item.active{background:var(--primary);color:white}
+        .menu-item i{font-size:1.2rem;width:24px}
+        .menu-item span{font-weight:600}
+        .main-content{flex:1;padding:30px;overflow-y:auto}
+        .card{background:white;border-radius:var(--border-radius);padding:30px;box-shadow:var(--box-shadow);margin-bottom:30px}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
+        .card-header h2{color:var(--primary);font-size:1.5rem;font-weight:700}
+        .btn{padding:12px 24px;border:none;border-radius:var(--border-radius);font-size:15px;font-weight:600;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px}
+        .btn-primary{background:linear-gradient(45deg,var(--primary),var(--secondary));color:white}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(67,97,238,0.3)}
         .btn-success{background-color:var(--success);color:white}
         .btn-success:hover{background-color:#3ab4d9}
-        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;margin-top:20px}
+        .form-group{margin-bottom:20px}
+        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark)}
+        input,textarea{width:100%;padding:12px 15px;border:2px solid var(--gray-light);border-radius:var(--border-radius);font-size:15px;transition:var(--transition)}
+        input:focus,textarea:focus{outline:none;border-color:var(--primary)}
+        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:25px;margin-top:20px}
         .product-card{background:white;border-radius:var(--border-radius);padding:20px;box-shadow:var(--box-shadow);border:1px solid #e9ecef;transition:var(--transition)}
         .product-card:hover{transform:translateY(-5px);box-shadow:0 15px 30px rgba(0,0,0,0.15)}
         .product-header{display:flex;align-items:center;gap:15px;margin-bottom:15px}
@@ -43,7 +54,7 @@
         .stat{text-align:center}
         .stat-value{font-size:1.2rem;font-weight:700;color:var(--primary)}
         .stat-label{font-size:0.8rem;color:var(--gray)}
-        .result-box{background:#f8f9fa;border-radius:var(--border-radius);padding:25px;margin-top:25px;display:none}
+        .result-box{background:#f8f9fa;border-radius:var(--border-radius);padding:25px;margin-top:25px;display:none;border:1px solid var(--gray-light)}
         .result-box.show{display:block;animation:fadeIn 0.3s ease-out}
         .account-details{margin-top:15px}
         .detail-row{display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #e9ecef}
@@ -52,76 +63,202 @@
         .copy-btn{background:var(--primary);color:white;border:none;padding:8px 15px;border-radius:var(--border-radius);cursor:pointer;margin-top:15px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
         .notification{position:fixed;bottom:20px;right:20px;padding:15px 25px;border-radius:var(--border-radius);color:white;font-weight:600;box-shadow:var(--box-shadow);z-index:1001;animation:slideInRight 0.3s ease-out;display:none;align-items:center;gap:10px}
         .notification.success{background:var(--success)}
-        .notification.error{background:#f72585}
+        .notification.error{background:var(--danger)}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
         @keyframes slideInRight{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
         .empty-state{text-align:center;padding:40px;color:var(--gray)}
         .empty-state i{font-size:3rem;margin-bottom:15px;color:#e9ecef}
+        .chat-container{max-height:400px;overflow-y:auto;padding:15px;background:var(--light);border-radius:var(--border-radius);margin-bottom:20px}
+        .message{margin-bottom:15px;max-width:80%}
+        .message.user{margin-left:auto}
+        .message.admin{margin-right:auto}
+        .message-content{padding:12px 15px;border-radius:var(--border-radius);box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+        .message.user .message-content{background:var(--primary);color:white}
+        .message.admin .message-content{background:var(--gray-light);color:var(--dark)}
+        .message-time{font-size:0.8rem;color:var(--gray);margin-top:5px}
+        .overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999}
+        @media(max-width:768px){.burger-menu{display:flex}.sidebar{position:fixed;left:-280px;top:70px;height:calc(100vh - 70px);z-index:1000}.sidebar.active{left:0}.overlay.active{display:block}.navbar-brand h1{font-size:1.2rem}.main-content{padding:20px 15px}.product-grid{grid-template-columns:1fr}}
+        @media(max-width:480px){.card{padding:20px}.btn{padding:10px 15px;font-size:14px}.card-header{flex-direction:column;align-items:flex-start}}
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand">
-            <i class="fas fa-lock"></i>
-            <h1>Account Manager - User</h1>
+        <div class="navbar-left">
+            <div class="burger-menu" id="burgerMenu">
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+            </div>
+            <div class="navbar-brand">
+                <i class="fas fa-user-shield"></i>
+                <h1>User Panel</h1>
+            </div>
         </div>
-        <button class="logout-btn" id="logoutBtn">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
+        <div class="user-info">
+            <div class="notification-badge">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge-count" id="unreadCount">0</span>
+                </button>
+            </div>
+            <span><strong id="userName">User</strong></span>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
     </nav>
 
+    <div class="overlay" id="overlay"></div>
+
     <div class="container">
-        <div class="hero">
-            <h2>Redeem Akun Premium</h2>
-            <p>Masukkan kode produk untuk mendapatkan akses akun premium</p>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="redeem">
+                    <i class="fas fa-gift"></i>
+                    <span>Redeem Code</span>
+                </a>
+                <a href="#" class="menu-item" data-section="products">
+                    <i class="fas fa-box"></i>
+                    <span>Produk</span>
+                </a>
+                <a href="#" class="menu-item" data-section="history">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </a>
+                <a href="#" class="menu-item" data-section="chat">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat Admin</span>
+                    <span class="badge danger" id="chatBadge" style="margin-left:auto;display:none">0</span>
+                </a>
+                <a href="#" class="menu-item" data-section="help">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Bantuan</span>
+                </a>
+            </div>
         </div>
 
         <div class="main-content">
-            <div class="card">
-                <h3><i class="fas fa-key"></i> Redeem Kode</h3>
-                <form id="redeemForm">
-                    <div class="form-group">
-                        <label for="code">Kode Produk</label>
-                        <input type="text" id="code" placeholder="Contoh: NETFLIX-ABC123" required>
-                        <p style="font-size:0.9rem;color:var(--gray);margin-top:8px">Masukkan kode yang diberikan oleh admin</p>
+            <div class="section active" id="redeemSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-gift"></i> Redeem Code</h2>
                     </div>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-gift"></i> Redeem Akun
-                    </button>
-                </form>
+                    <form id="redeemForm">
+                        <div class="form-group">
+                            <label for="code"><i class="fas fa-key"></i> Masukkan Kode</label>
+                            <input type="text" id="code" placeholder="Contoh: AMP-UWGSG1726" required>
+                            <small style="color:var(--gray);font-size:0.9rem;display:block;margin-top:8px">Masukkan kode yang diberikan oleh admin</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-gift"></i> Redeem Akun
+                        </button>
+                    </form>
 
-                <div class="result-box" id="resultBox">
-                    <h3 style="color:var(--success);margin-top:0"><i class="fas fa-check-circle"></i> Redeem Berhasil!</h3>
-                    <div class="account-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Produk:</span>
-                            <span class="detail-value" id="resultProduct">Netflix Premium</span>
+                    <div class="result-box" id="resultBox">
+                        <h2 style="color:var(--success);margin-top:0;display:flex;align-items:center;gap:10px">
+                            <i class="fas fa-check-circle"></i> Redeem Berhasil!
+                        </h2>
+                        <div class="account-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Produk:</span>
+                                <span class="detail-value" id="resultProduct">Netflix Premium</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email/Username:</span>
+                                <span class="detail-value" id="resultEmail">user@example.com</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Password:</span>
+                                <span class="detail-value" id="resultPassword">password123</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Login Via:</span>
+                                <span class="detail-value" id="resultLoginVia">Email</span>
+                            </div>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Email/Username:</span>
-                            <span class="detail-value" id="resultEmail">user@example.com</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Password:</span>
-                            <span class="detail-value" id="resultPassword">password123</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Login Via:</span>
-                            <span class="detail-value" id="resultLoginVia">Email</span>
+                        <button class="copy-btn" id="copyAllBtn">
+                            <i class="fas fa-copy"></i> Salin Semua Informasi
+                        </button>
+                        <div style="margin-top:20px;padding:15px;background:rgba(76,201,240,0.1);border-radius:var(--border-radius);border-left:4px solid var(--success)">
+                            <p style="margin:0;color:var(--dark)"><i class="fas fa-lightbulb"></i> <strong>Tips:</strong> Simpan informasi akun di tempat yang aman!</p>
                         </div>
                     </div>
-                    <button class="copy-btn" id="copyAllBtn">
-                        <i class="fas fa-copy"></i> Salin Semua Informasi
-                    </button>
                 </div>
             </div>
 
-            <div class="card">
-                <h3><i class="fas fa-box"></i> Produk Tersedia</h3>
-                <div id="productsList">
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <p>Memuat produk...</p>
+            <div class="section" id="productsSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-box"></i> Produk Tersedia</h2>
+                    </div>
+                    <div id="productsList">
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <p>Memuat produk...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="historySection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-history"></i> Riwayat Redeem</h2>
+                    </div>
+                    <div id="redeemHistory">
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <p>Belum ada riwayat redeem</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="chatSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-comments"></i> Chat dengan Admin</h2>
+                    </div>
+                    <div class="chat-container" id="chatMessages">
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <p>Belum ada pesan</p>
+                        </div>
+                    </div>
+                    <form id="chatForm">
+                        <div class="form-group">
+                            <textarea id="chatMessage" rows="3" placeholder="Tulis pesan untuk admin..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Kirim Pesan
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="section" id="helpSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-question-circle"></i> Bantuan & Panduan</h2>
+                    </div>
+                    <div style="display:grid;gap:20px">
+                        <div style="padding:20px;background:var(--light);border-radius:var(--border-radius)">
+                            <h3 style="color:var(--primary);margin-bottom:15px"><i class="fas fa-key"></i> Cara Redeem</h3>
+                            <ol style="padding-left:20px;margin:0">
+                                <li>Dapatkan kode dari admin</li>
+                                <li>Masukkan kode di halaman "Redeem Code"</li>
+                                <li>Klik tombol "Redeem Akun"</li>
+                                <li>Simpan informasi akun yang muncul</li>
+                            </ol>
+                        </div>
+                        <div style="padding:20px;background:var(--light);border-radius:var(--border-radius)">
+                            <h3 style="color:var(--primary);margin-bottom:15px"><i class="fas fa-comments"></i> Chat Admin</h3>
+                            <p>Gunakan fitur chat jika mengalami masalah atau memiliki pertanyaan.</p>
+                        </div>
+                        <div style="padding:20px;background:var(--light);border-radius:var(--border-radius)">
+                            <h3 style="color:var(--primary);margin-bottom:15px"><i class="fas fa-shield-alt"></i> Keamanan</h3>
+                            <p>• Simpan informasi akun dengan aman<br>• Jangan bagikan kode kepada orang lain<br>• Laporkan masalah segera ke admin</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,8 +269,60 @@
 
     <script>
         const userRole = localStorage.getItem('userRole');
+        const username = localStorage.getItem('username') || 'User';
+        const userName = localStorage.getItem('userName') || 'User';
+        
         if (!userRole || userRole !== 'user') {
             window.location.href = 'index.html';
+        }
+
+        document.getElementById('userName').textContent = userName;
+
+        let redeemHistory = [];
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'flex';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const burger = document.getElementById('burgerMenu');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            burger.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const burger = document.getElementById('burgerMenu');
+            
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            burger.classList.remove('active');
+        }
+
+        function switchSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            document.getElementById(sectionId + 'Section').classList.add('active');
+            document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
+            
+            closeSidebar();
+            
+            if (sectionId === 'products') loadProducts();
+            else if (sectionId === 'history') loadHistory();
+            else if (sectionId === 'chat') loadMessages();
         }
 
         async function loadProducts() {
@@ -144,12 +333,7 @@
                 const container = document.getElementById('productsList');
                 
                 if (products.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-box-open"></i>
-                            <p>Tidak ada produk tersedia</p>
-                        </div>
-                    `;
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Tidak ada produk tersedia</p></div>';
                     return;
                 }
 
@@ -161,10 +345,15 @@
                         'spotify': 'fab fa-spotify',
                         'youtube': 'fab fa-youtube',
                         'discord': 'fab fa-discord',
+                        'google': 'fab fa-google',
+                        'facebook': 'fab fa-facebook',
+                        'instagram': 'fab fa-instagram',
+                        'twitter': 'fab fa-twitter',
+                        'tiktok': 'fab fa-tiktok',
                         'default': 'fas fa-box'
                     };
                     
-                    let icon = icons.default;
+                    let icon = product.logo || icons.default;
                     const nameLower = product.name.toLowerCase();
                     for (const [key, value] of Object.entries(icons)) {
                         if (nameLower.includes(key)) {
@@ -192,7 +381,7 @@
                                 </div>
                                 <div class="stat">
                                     <div class="stat-value">${product.available_accounts || 0}</div>
-                                    <div class="stat-label">Akun Tersedia</div>
+                                    <div class="stat-label">Tersedia</div>
                                 </div>
                             </div>
                         </div>
@@ -207,20 +396,159 @@
             }
         }
 
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'flex';
+        function loadHistory() {
+            const container = document.getElementById('redeemHistory');
             
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+            if (redeemHistory.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>Belum ada riwayat redeem</p></div>';
+                return;
+            }
+
+            let html = '<div style="display:grid;gap:15px">';
+            
+            redeemHistory.forEach(item => {
+                html += `
+                    <div style="padding:15px;background:var(--light);border-radius:var(--border-radius);border-left:4px solid var(--success)">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                            <div style="font-weight:600">${item.product}</div>
+                            <span style="font-size:0.9rem;color:var(--gray)">${item.date}</span>
+                        </div>
+                        <div style="font-size:0.9rem;color:var(--gray)">Email: ${item.email}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
         }
 
+        async function loadMessages() {
+            try {
+                const userId = username;
+                const response = await fetch(`/api/messages?user_id=${userId}`);
+                const messages = await response.json();
+                
+                const container = document.getElementById('chatMessages');
+                if (messages.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Belum ada pesan</p></div>';
+                    return;
+                }
+
+                let html = '';
+                messages.forEach(msg => {
+                    html += `
+                        <div class="message ${msg.role}">
+                            <div class="message-content">
+                                <div><strong>${msg.username}:</strong> ${msg.message}</div>
+                                <div class="message-time">${new Date(msg.created_at).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                container.scrollTop = container.scrollHeight;
+                
+                // Update unread count
+                const unread = messages.filter(m => m.status === 'unread' && m.role === 'admin').length;
+                document.getElementById('unreadCount').textContent = unread;
+                document.getElementById('chatBadge').textContent = unread;
+                document.getElementById('chatBadge').style.display = unread > 0 ? 'inline-block' : 'none';
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        async function checkUnreadMessages() {
+            try {
+                const response = await fetch('/api/messages/unread/count');
+                const data = await response.json();
+                document.getElementById('unreadCount').textContent = data.count || 0;
+                document.getElementById('chatBadge').textContent = data.count || 0;
+                document.getElementById('chatBadge').style.display = data.count > 0 ? 'inline-block' : 'none';
+            } catch (error) {
+                console.error('Error checking unread messages:', error);
+            }
+        }
+
+        async function redeemCode(code) {
+            try {
+                const response = await fetch('/api/redeem', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ code })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show result
+                    document.getElementById('resultProduct').textContent = data.account.product;
+                    document.getElementById('resultEmail').textContent = data.account.email;
+                    document.getElementById('resultPassword').textContent = data.account.password;
+                    document.getElementById('resultLoginVia').textContent = data.account.login_via;
+                    
+                    document.getElementById('resultBox').classList.add('show');
+                    document.getElementById('code').value = '';
+                    
+                    // Add to history
+                    redeemHistory.unshift({
+                        product: data.account.product,
+                        email: data.account.email,
+                        date: new Date().toLocaleString()
+                    });
+                    
+                    showNotification('Akun berhasil diredeem!', 'success');
+                    
+                    // Refresh products
+                    loadProducts();
+                } else {
+                    showNotification(data.error || 'Gagal redeem kode', 'error');
+                }
+            } catch (error) {
+                showNotification('Terjadi kesalahan', 'error');
+            }
+        }
+
+        async function sendMessage(message) {
+            try {
+                const response = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: username,
+                        username: userName,
+                        message: message,
+                        role: 'user'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Pesan berhasil dikirim', 'success');
+                    loadMessages();
+                    document.getElementById('chatMessage').value = '';
+                }
+            } catch (error) {
+                showNotification('Gagal mengirim pesan', 'error');
+            }
+        }
+
+        // Event Listeners
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.clear();
             window.location.href = 'index.html';
+        });
+
+        document.getElementById('burgerMenu').addEventListener('click', toggleSidebar);
+        document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = item.getAttribute('data-section');
+                switchSection(section);
+            });
         });
 
         document.getElementById('redeemForm').addEventListener('submit', async (e) => {
@@ -232,33 +560,19 @@
                 return;
             }
 
-            try {
-                const response = await fetch('/api/redeem', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ code })
-                });
+            await redeemCode(code);
+        });
 
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('resultProduct').textContent = data.account.product;
-                    document.getElementById('resultEmail').textContent = data.account.email;
-                    document.getElementById('resultPassword').textContent = data.account.password;
-                    document.getElementById('resultLoginVia').textContent = data.account.login_via;
-                    
-                    document.getElementById('resultBox').classList.add('show');
-                    document.getElementById('code').value = '';
-                    
-                    showNotification('Akun berhasil diredeem!', 'success');
-                    
-                    loadProducts();
-                } else {
-                    showNotification(data.error || 'Gagal redeem kode', 'error');
-                }
-            } catch (error) {
-                showNotification('Terjadi kesalahan', 'error');
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const message = document.getElementById('chatMessage').value.trim();
+            if (!message) {
+                showNotification('Masukkan pesan terlebih dahulu', 'error');
+                return;
             }
+            
+            await sendMessage(message);
         });
 
         document.getElementById('copyAllBtn').addEventListener('click', () => {
@@ -269,7 +583,20 @@
             });
         });
 
+        document.getElementById('notificationBtn').addEventListener('click', () => {
+            switchSection('chat');
+        });
+
+        // Load initial data
         loadProducts();
+        loadMessages();
+        checkUnreadMessages();
+
+        // Auto refresh messages every 15 seconds
+        setInterval(() => {
+            loadMessages();
+            checkUnreadMessages();
+        }, 15000);
     </script>
 </body>
 </html>
