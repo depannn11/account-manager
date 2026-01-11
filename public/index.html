@@ -3,1302 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Manager - Admin Panel</title>
+    <title>Account Manager - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--warning:#f8961e;--dark:#1a1a2e;--light:#f8f9fa;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 20px rgba(0,0,0,0.1);--transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1)}
-        body{background:#f5f7fa;color:var(--dark);min-height:100vh}
-        .navbar{background:white;padding:15px 30px;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
-        .navbar-left{display:flex;align-items:center;gap:20px}
-        .burger-menu{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:8px}
-        .burger-line{width:25px;height:3px;background:var(--dark);border-radius:2px;transition:var(--transition)}
-        .navbar-brand{display:flex;align-items:center;gap:15px}
-        .navbar-brand i{font-size:1.8rem;color:var(--primary)}
-        .navbar-brand h1{font-size:1.5rem;color:var(--dark);font-weight:700}
-        .user-info{display:flex;align-items:center;gap:15px}
-        .notification-badge{position:relative}
-        .notification-btn{background:none;border:none;font-size:1.3rem;color:var(--gray);cursor:pointer;padding:8px;position:relative}
-        .badge-count{position:absolute;top:0;right:0;background:var(--danger);color:white;font-size:0.7rem;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
-        .logout-btn{background:var(--danger);color:white;border:none;padding:8px 20px;border-radius:var(--border-radius);cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600;transition:var(--transition)}
-        .logout-btn:hover{background:#e11570;transform:translateY(-2px)}
-        .container{display:flex;min-height:calc(100vh - 70px)}
-        .sidebar{width:280px;background:white;padding:25px 0;box-shadow:2px 0 10px rgba(0,0,0,0.1);transition:var(--transition)}
-        .sidebar-menu{padding:0 20px}
-        .menu-item{display:flex;align-items:center;gap:15px;padding:15px;margin-bottom:10px;border-radius:var(--border-radius);cursor:pointer;transition:var(--transition);color:var(--gray);text-decoration:none}
-        .menu-item:hover{background:var(--gray-light);color:var(--primary)}
-        .menu-item.active{background:var(--primary);color:white}
-        .menu-item i{font-size:1.2rem;width:24px}
-        .menu-item span{font-weight:600}
-        .main-content{flex:1;padding:30px;overflow-y:auto}
-        .dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;margin-bottom:40px}
-        .stat-card{background:white;border-radius:var(--border-radius);padding:25px;box-shadow:var(--box-shadow);transition:var(--transition)}
-        .stat-card:hover{transform:translateY(-5px);box-shadow:0 15px 30px rgba(0,0,0,0.15)}
-        .stat-icon{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.5rem}
-        .stat-icon.primary{background:rgba(67,97,238,0.1);color:var(--primary)}
-        .stat-icon.success{background:rgba(76,201,240,0.1);color:var(--success)}
-        .stat-icon.warning{background:rgba(248,150,30,0.1);color:var(--warning)}
-        .stat-icon.danger{background:rgba(247,37,133,0.1);color:var(--danger)}
-        .stat-value{font-size:2.2rem;font-weight:700;margin-bottom:5px}
-        .stat-label{color:var(--gray);font-size:0.9rem}
-        .card{background:white;border-radius:var(--border-radius);padding:30px;box-shadow:var(--box-shadow);margin-bottom:30px}
-        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
-        .card-header h2{color:var(--primary);font-size:1.5rem;font-weight:700}
-        .btn{padding:12px 24px;border:none;border-radius:var(--border-radius);font-size:15px;font-weight:600;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px}
-        .btn-primary{background-color:var(--primary);color:white}
-        .btn-primary:hover{background-color:var(--primary-dark);transform:translateY(-2px)}
-        .btn-success{background-color:var(--success);color:white}
-        .btn-success:hover{background-color:#3ab4d9}
-        .btn-danger{background-color:var(--danger);color:white}
-        .btn-danger:hover{background-color:#e11570}
-        .btn-warning{background-color:var(--warning);color:white}
-        .btn-warning:hover{background-color:#e6891b}
-        table{width:100%;border-collapse:collapse;margin-top:20px}
-        th,td{padding:15px;text-align:left;border-bottom:1px solid var(--gray-light)}
-        th{background:var(--gray-light);font-weight:600;color:var(--dark)}
-        tr:hover{background:rgba(67,97,238,0.05)}
-        .badge{padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:600}
-        .badge.success{background:rgba(76,201,240,0.1);color:var(--success)}
-        .badge.danger{background:rgba(247,37,133,0.1);color:var(--danger)}
-        .badge.warning{background:rgba(248,150,30,0.1);color:var(--warning)}
-        .badge.info{background:rgba(67,97,238,0.1);color:var(--primary)}
+        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--warning:#f8961e;--dark:#1a1a2e;--light:#f8f9fa;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 30px rgba(0,0,0,0.1);--transition:all 0.3s ease}
+        body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+        .login-container{width:100%;max-width:450px}
+        .login-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:var(--border-radius);padding:40px;box-shadow:var(--box-shadow);animation:slideUp 0.5s ease-out;border:1px solid rgba(255,255,255,0.2)}
+        .logo{text-align:center;margin-bottom:30px}
+        .logo i{font-size:3.5rem;color:var(--primary);margin-bottom:15px;background:linear-gradient(45deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .logo h1{color:var(--dark);font-size:2rem;font-weight:700}
+        .logo p{color:var(--gray);margin-top:10px;font-size:0.9rem}
         .form-group{margin-bottom:20px}
-        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark)}
-        input,select,textarea{width:100%;padding:12px 15px;border:2px solid var(--gray-light);border-radius:var(--border-radius);font-size:15px;transition:var(--transition)}
-        input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;animation:fadeIn 0.3s ease-out}
-        .modal-content{background:white;border-radius:var(--border-radius);width:90%;max-width:500px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2)}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-        .modal-header h3{color:var(--primary);font-size:1.5rem}
-        .close-modal{background:none;border:none;font-size:1.8rem;color:var(--gray);cursor:pointer}
-        .notification{position:fixed;bottom:20px;right:20px;padding:15px 25px;border-radius:var(--border-radius);color:white;font-weight:600;box-shadow:var(--box-shadow);z-index:1001;animation:slideInRight 0.3s ease-out;display:none;align-items:center;gap:10px}
-        .notification.success{background:var(--success)}
-        .notification.error{background:var(--danger)}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        @keyframes slideInRight{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:25px}
-        .code-list{max-height:400px;overflow-y:auto}
-        .code-item{background:var(--gray-light);padding:12px 15px;border-radius:var(--border-radius);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-        .code-text{font-family:monospace;font-weight:600;font-size:0.9rem}
-        .copy-btn{background:var(--primary);color:white;border:none;padding:5px 15px;border-radius:var(--border-radius);cursor:pointer;font-size:0.8rem}
-        .chat-container{max-height:400px;overflow-y:auto;padding:15px;background:var(--light);border-radius:var(--border-radius);margin-bottom:20px}
-        .message{margin-bottom:15px;max-width:80%}
-        .message.user{margin-left:auto}
-        .message.admin{margin-right:auto}
-        .message-content{padding:12px 15px;border-radius:var(--border-radius);box-shadow:0 2px 5px rgba(0,0,0,0.1)}
-        .message.user .message-content{background:var(--primary);color:white}
-        .message.admin .message-content{background:var(--gray-light);color:var(--dark)}
-        .message-time{font-size:0.8rem;color:var(--gray);margin-top:5px}
-        .empty-state{text-align:center;padding:40px;color:var(--gray)}
-        .empty-state i{font-size:3rem;margin-bottom:15px;color:#e9ecef}
-        .tab-navigation{display:flex;gap:10px;margin-bottom:30px;background:white;padding:10px;border-radius:var(--border-radius);box-shadow:var(--box-shadow);flex-wrap:wrap}
-        .tab-btn{padding:12px 25px;border:none;background:none;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition)}
-        .tab-btn.active{background:var(--primary);color:white}
-        .tab-btn:hover:not(.active){background:var(--gray-light)}
-        .tab-content{display:none;animation:fadeIn 0.3s ease-out}
-        .tab-content.active{display:block}
-        .overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999}
-        @media(max-width:992px){.grid-2{grid-template-columns:1fr}.container{padding:0}.main-content{padding:20px 15px}}
-        @media(max-width:768px){.burger-menu{display:flex}.sidebar{position:fixed;left:-280px;top:70px;height:calc(100vh - 70px);z-index:1000}.sidebar.active{left:0}.overlay.active{display:block}.navbar-brand h1{font-size:1.2rem}.card-header{flex-direction:column;align-items:flex-start}.tab-navigation{overflow-x:auto;flex-wrap:nowrap}.tab-btn{padding:10px 15px;font-size:0.9rem}}
-        @media(max-width:480px){.stat-card{padding:20px}.card{padding:20px}.btn{padding:10px 15px;font-size:14px}}
+        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark);font-size:0.9rem}
+        input{width:100%;padding:15px;border:2px solid var(--gray-light);border-radius:var(--border-radius);font-size:16px;transition:var(--transition);background:white}
+        input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,0.2)}
+        .btn{width:100%;padding:15px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px}
+        .btn-primary{background:linear-gradient(45deg,var(--primary),var(--secondary));color:white;position:relative;overflow:hidden}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(67,97,238,0.3)}
+        .btn-primary:active{transform:translateY(0)}
+        .role-selector{display:flex;gap:10px;margin-bottom:25px}
+        .role-btn{flex:1;padding:12px;border:2px solid var(--gray-light);background:white;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center}
+        .role-btn.active{border-color:var(--primary);background:linear-gradient(45deg,var(--primary),var(--secondary));color:white}
+        .role-btn:hover:not(.active){border-color:var(--primary)}
+        .error-message{background:rgba(247,37,133,0.1);color:var(--danger);padding:12px;border-radius:var(--border-radius);margin-top:20px;text-align:center;display:none;border:1px solid rgba(247,37,133,0.2)}
+        .demo-credentials{margin-top:25px;padding:20px;background:rgba(248,249,250,0.8);border-radius:var(--border-radius);border:1px solid var(--gray-light)}
+        .demo-credentials h4{display:flex;align-items:center;gap:10px;margin-bottom:15px;color:var(--gray)}
+        .credential-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-light)}
+        .credential-item:last-child{border-bottom:none}
+        .credential-role{font-weight:600;color:var(--dark)}
+        .credential-details{color:var(--gray);font-size:0.9rem}
+        .footer{margin-top:25px;text-align:center;color:var(--gray);font-size:0.8rem}
+        @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        @media(max-width:480px){.login-card{padding:30px 20px}.logo h1{font-size:1.6rem}.role-selector{flex-direction:column}}
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-left">
-            <div class="burger-menu" id="burgerMenu">
-                <div class="burger-line"></div>
-                <div class="burger-line"></div>
-                <div class="burger-line"></div>
-            </div>
-            <div class="navbar-brand">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
                 <i class="fas fa-shield-alt"></i>
-                <h1>Admin Panel</h1>
+                <h1>Account Manager Pro</h1>
+                <p>Secure Account Management System</p>
             </div>
-        </div>
-        <div class="user-info">
-            <div class="notification-badge">
-                <button class="notification-btn" id="notificationBtn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge-count" id="unreadCount">0</span>
+
+            <div class="role-selector">
+                <button type="button" class="role-btn active" id="userBtn">
+                    <i class="fas fa-user"></i> User Panel
+                </button>
+                <button type="button" class="role-btn" id="adminBtn">
+                    <i class="fas fa-crown"></i> Admin Panel
                 </button>
             </div>
-            <span><strong id="adminName">Administrator</strong></span>
-            <button class="logout-btn" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
-    </nav>
 
-    <div class="overlay" id="overlay"></div>
-
-    <div class="container">
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-menu">
-                <a href="#" class="menu-item active" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="menu-item" data-section="products">
-                    <i class="fas fa-box"></i>
-                    <span>Produk</span>
-                </a>
-                <a href="#" class="menu-item" data-section="accounts">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Akun</span>
-                </a>
-                <a href="#" class="menu-item" data-section="codes">
-                    <i class="fas fa-key"></i>
-                    <span>Kode</span>
-                </a>
-                <a href="#" class="menu-item" data-section="chat">
-                    <i class="fas fa-comments"></i>
-                    <span>Chat</span>
-                    <span class="badge danger" id="chatBadge" style="margin-left:auto;display:none">0</span>
-                </a>
-                <a href="#" class="menu-item" data-section="stats">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Statistik</span>
-                </a>
-                <a href="#" class="menu-item" data-section="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="section active" id="dashboardSection">
-                <h2 style="margin-bottom:30px;color:var(--primary)"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
-                <div class="dashboard">
-                    <div class="stat-card">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div class="stat-value" id="totalProducts">0</div>
-                        <div class="stat-label">Total Produk</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <div class="stat-value" id="totalAccounts">0</div>
-                        <div class="stat-label">Total Akun</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div class="stat-value" id="availableAccounts">0</div>
-                        <div class="stat-label">Akun Tersedia</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon danger">
-                            <i class="fas fa-code"></i>
-                        </div>
-                        <div class="stat-value" id="totalCodes">0</div>
-                        <div class="stat-label">Kode Dibuat</div>
-                    </div>
+            <form id="loginForm">
+                <div class="form-group" id="usernameField">
+                    <label for="username"><i class="fas fa-user-circle"></i> Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
                 </div>
-
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
-                        </div>
-                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px">
-                            <button class="btn btn-primary" id="quickAddProduct">
-                                <i class="fas fa-plus"></i> Produk Baru
-                            </button>
-                            <button class="btn btn-success" id="quickAddAccount">
-                                <i class="fas fa-user-plus"></i> Tambah Akun
-                            </button>
-                            <button class="btn btn-warning" id="quickGenerateCode">
-                                <i class="fas fa-key"></i> Generate Kode
-                            </button>
-                            <button class="btn btn-primary" id="quickCheckMessages">
-                                <i class="fas fa-comments"></i> Cek Pesan
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2><i class="fas fa-history"></i> Aktivitas Terbaru</h2>
-                        </div>
-                        <div id="recentActivity">
-                            <p style="text-align:center;color:var(--gray);padding:20px">Memuat aktivitas...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" id="productsSection">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-box"></i> Kelola Produk</h2>
-                        <button class="btn btn-primary" id="addProductBtn">
-                            <i class="fas fa-plus"></i> Tambah Produk
-                        </button>
-                    </div>
-                    <div id="productsList"></div>
-                </div>
-            </div>
-
-            <div class="section" id="accountsSection">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-user-shield"></i> Kelola Akun</h2>
-                        <div style="display:flex;gap:15px;flex-wrap:wrap">
-                            <select id="productSelect" style="min-width:200px">
-                                <option value="">Pilih Produk</option>
-                            </select>
-                            <button class="btn btn-primary" id="addAccountBtn">
-                                <i class="fas fa-plus"></i> Tambah Akun
-                            </button>
-                            <button class="btn btn-success" id="importAccountsBtn">
-                                <i class="fas fa-file-import"></i> Import Bulk
-                            </button>
-                        </div>
-                    </div>
-                    <div id="accountsList"></div>
-                </div>
-            </div>
-
-            <div class="section" id="codesSection">
-                <div class="tab-navigation">
-                    <button class="tab-btn active" data-tab="generate">Generate Kode</button>
-                    <button class="tab-btn" data-tab="manage">Kelola Kode</button>
-                </div>
-                <div class="tab-content active" id="generateTab">
-                    <div class="grid-2">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2><i class="fas fa-key"></i> Generate Single Code</h2>
-                            </div>
-                            <form id="generateCodeForm">
-                                <div class="form-group">
-                                    <label>Pilih Produk</label>
-                                    <select id="codeProductSelect" required>
-                                        <option value="">Pilih Produk</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Pilih Akun</label>
-                                    <select id="accountSelect" required>
-                                        <option value="">Pilih Akun</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Custom Prefix (opsional)</label>
-                                    <input type="text" id="customPrefix" placeholder="AMP" maxlength="6">
-                                    <small style="color:var(--gray);font-size:0.8rem">Contoh: AMP-UWGSG1726</small>
-                                </div>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-bolt"></i> Generate Kode
-                                </button>
-                            </form>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h2><i class="fas fa-layer-group"></i> Generate Multiple Codes</h2>
-                            </div>
-                            <form id="generateMultipleForm">
-                                <div class="form-group">
-                                    <label>Pilih Produk</label>
-                                    <select id="multipleProductSelect" required>
-                                        <option value="">Pilih Produk</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Jumlah Kode</label>
-                                    <input type="number" id="codeCount" min="1" max="50" value="5" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Custom Prefix (opsional)</label>
-                                    <input type="text" id="multipleCustomPrefix" placeholder="AMP" maxlength="6">
-                                </div>
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-bolt"></i> Generate Multiple
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-content" id="manageTab">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2><i class="fas fa-list"></i> Daftar Kode</h2>
-                            <select id="viewCodeProductSelect" style="min-width:200px">
-                                <option value="">Pilih Produk</option>
-                            </select>
-                        </div>
-                        <div class="code-list" id="codesList"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" id="chatSection">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-comments"></i> Chat dengan Users</h2>
-                    </div>
-                    <div class="chat-container" id="chatMessages">
-                        <div class="empty-state">
-                            <i class="fas fa-comments"></i>
-                            <p>Belum ada pesan</p>
-                        </div>
-                    </div>
-                    <form id="chatForm">
-                        <div class="form-group">
-                            <label>Kirim Pesan ke Semua User</label>
-                            <textarea id="chatMessage" rows="3" placeholder="Tulis pesan broadcast..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane"></i> Kirim Pesan
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="section" id="statsSection">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-chart-bar"></i> Statistik Detail</h2>
-                    </div>
-                    <div class="grid-2">
-                        <div>
-                            <canvas id="statsChart" width="400" height="300"></canvas>
-                        </div>
-                        <div>
-                            <div class="stat-card" style="margin-bottom:15px">
-                                <div class="stat-value" id="usedCodes">0</div>
-                                <div class="stat-label">Kode Terpakai</div>
-                            </div>
-                            <div class="stat-card" style="margin-bottom:15px">
-                                <div class="stat-value" id="availableCodes">0</div>
-                                <div class="stat-label">Kode Tersedia</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value" id="usedAccounts">0</div>
-                                <div class="stat-label">Akun Terpakai</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" id="settingsSection">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-cog"></i> Pengaturan</h2>
-                    </div>
-                    <div class="grid-2">
-                        <div>
-                            <h3 style="margin-bottom:20px;color:var(--primary)"><i class="fas fa-user-cog"></i> Admin Settings</h3>
-                            <div class="form-group">
-                                <label>Username Admin</label>
-                                <input type="text" value="admin" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label>Password User Default</label>
-                                <input type="text" value="1" disabled>
-                            </div>
-                            <button class="btn btn-primary" onclick="showNotification('Settings saved!', 'success')">
-                                <i class="fas fa-save"></i> Simpan Pengaturan
-                            </button>
-                        </div>
-                        <div>
-                            <h3 style="margin-bottom:20px;color:var(--primary)"><i class="fas fa-info-circle"></i> System Info</h3>
-                            <div style="background:var(--light);padding:20px;border-radius:var(--border-radius)">
-                                <p><strong>Versi:</strong> 2.0.0</p>
-                                <p><strong>Database:</strong> SQLite</p>
-                                <p><strong>Status:</strong> <span class="badge success">Online</span></p>
-                                <p><strong>Server:</strong> Vercel</p>
-                                <p><strong>API Endpoints:</strong> Active</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="productModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Tambah Produk Baru</h3>
-                <button class="close-modal" id="closeProductModal">&times;</button>
-            </div>
-            <form id="productForm">
-                <input type="hidden" id="productId">
+                
                 <div class="form-group">
-                    <label>Kode Produk</label>
-                    <input type="text" id="productCode" placeholder="NETFLIX001" required>
+                    <label for="password"><i class="fas fa-key"></i> Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
                 </div>
-                <div class="form-group">
-                    <label>Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Netflix Premium" required>
-                </div>
-                <div class="form-group">
-                    <label>Deskripsi</label>
-                    <textarea id="productDescription" rows="3" placeholder="Akun Netflix Premium 4K UHD"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Icon (FontAwesome)</label>
-                    <input type="text" id="productLogo" placeholder="fas fa-film" value="fas fa-box">
-                </div>
-                <div class="form-group">
-                    <label>Stok Awal</label>
-                    <input type="number" id="productStock" min="0" value="0" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan
-                    </button>
-                </div>
+                
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login as User
+                </button>
             </form>
-        </div>
-    </div>
 
-    <div class="modal" id="accountModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Tambah Akun Baru</h3>
-                <button class="close-modal" id="closeAccountModal">&times;</button>
+            <div class="error-message" id="errorMessage">
+                Invalid credentials. Please try again.
             </div>
-            <form id="accountForm">
-                <input type="hidden" id="accountProductId">
-                <div class="form-group">
-                    <label>Email/Username</label>
-                    <input type="text" id="accountEmail" placeholder="user@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="text" id="accountPassword" placeholder="password123" required>
-                </div>
-                <div class="form-group">
-                    <label>Login Via</label>
-                    <select id="accountLoginVia" required>
-                        <option value="Email">Email</option>
-                        <option value="Facebook">Facebook</option>
-                        <option value="Google">Google</option>
-                        <option value="Username">Username</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Notes (opsional)</label>
-                    <textarea id="accountNotes" rows="2" placeholder="Additional information"></textarea>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan Akun
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
-    <div class="modal" id="importModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Import Akun Bulk</h3>
-                <button class="close-modal" id="closeImportModal">&times;</button>
+            <div class="demo-credentials">
+                <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
+                <div class="credential-item">
+                    <span class="credential-role">Admin</span>
+                    <span class="credential-details">admin / admin123</span>
+                </div>
+                <div class="credential-item">
+                    <span class="credential-role">User</span>
+                    <span class="credential-details">any / 1</span>
+                </div>
             </div>
-            <form id="importForm">
-                <div class="form-group">
-                    <label>Pilih Produk</label>
-                    <select id="importProductSelect" required>
-                        <option value="">Pilih Produk</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Format: email|password|login_via</label>
-                    <textarea id="importText" rows="10" placeholder="user1@example.com|pass123|Email
-user2@example.com|pass456|Facebook
-user3@example.com|pass789|Google" required></textarea>
-                    <small style="color:var(--gray);font-size:0.8rem">Satu akun per baris. Login via opsional (default: Email)</small>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-file-import"></i> Import Akun
-                    </button>
-                </div>
-            </form>
+
+            <div class="footer">
+                <p>© 2024 Account Manager Pro | Secure by Design</p>
+            </div>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const userRole = localStorage.getItem('userRole');
-        if (!userRole || userRole !== 'admin') {
-            window.location.href = 'index.html';
-        }
+        const userBtn = document.getElementById('userBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const usernameField = document.getElementById('usernameField');
+        const usernameInput = document.getElementById('username');
+        const errorMessage = document.getElementById('errorMessage');
+        let currentRole = 'user';
 
-        const adminName = localStorage.getItem('userName') || 'Administrator';
-        document.getElementById('adminName').textContent = adminName;
+        userBtn.addEventListener('click', () => {
+            userBtn.classList.add('active');
+            adminBtn.classList.remove('active');
+            currentRole = 'user';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as User';
+            usernameField.style.display = 'block';
+            usernameInput.required = false;
+            usernameInput.placeholder = 'Optional username';
+        });
 
-        let products = [];
-        let currentProductId = null;
-        let chart = null;
+        adminBtn.addEventListener('click', () => {
+            adminBtn.classList.add('active');
+            userBtn.classList.remove('active');
+            currentRole = 'admin';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as Admin';
+            usernameField.style.display = 'block';
+            usernameInput.required = true;
+            usernameInput.placeholder = 'Enter admin username';
+        });
 
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'flex';
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            const burger = document.getElementById('burgerMenu');
+            const username = usernameInput.value;
+            const password = document.getElementById('password').value;
             
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-            burger.classList.toggle('active');
-        }
-
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            const burger = document.getElementById('burgerMenu');
-            
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            burger.classList.remove('active');
-        }
-
-        function switchSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            
-            document.getElementById(sectionId + 'Section').classList.add('active');
-            document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
-            
-            closeSidebar();
-            
-            if (sectionId === 'dashboard') loadDashboard();
-            else if (sectionId === 'products') loadProducts();
-            else if (sectionId === 'stats') loadStats();
-            else if (sectionId === 'chat') loadMessages();
-        }
-
-        async function loadDashboard() {
             try {
-                const [productsRes, statsRes, messagesRes] = await Promise.all([
-                    fetch('/api/products'),
-                    fetch('/api/stats'),
-                    fetch('/api/messages/unread/count')
-                ]);
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, password, role: currentRole })
+                });
                 
-                const productsData = await productsRes.json();
-                const statsData = await statsRes.json();
-                const messagesData = await messagesRes.json();
+                const data = await response.json();
                 
-                document.getElementById('totalProducts').textContent = statsData.products;
-                document.getElementById('totalAccounts').textContent = statsData.totalAccounts;
-                document.getElementById('availableAccounts').textContent = statsData.availableAccounts;
-                document.getElementById('totalCodes').textContent = statsData.totalCodes;
-                document.getElementById('unreadCount').textContent = messagesData.count || 0;
-                document.getElementById('chatBadge').textContent = messagesData.count || 0;
-                document.getElementById('chatBadge').style.display = messagesData.count > 0 ? 'inline-block' : 'none';
-                
-                let activityHtml = '';
-                if (productsData.length > 0) {
-                    const recentProducts = productsData.slice(0, 5);
-                    recentProducts.forEach(product => {
-                        activityHtml += `
-                            <div style="padding:10px;border-bottom:1px solid var(--gray-light);display:flex;justify-content:space-between;align-items:center">
-                                <div>
-                                    <div style="font-weight:600">${product.name}</div>
-                                    <div style="font-size:0.9rem;color:var(--gray)">${product.product_code} • ${product.available_accounts} akun tersedia</div>
-                                </div>
-                                <span class="badge ${product.stock > 0 ? 'success' : 'danger'}">${product.stock} stok</span>
-                            </div>
-                        `;
-                    });
+                if (data.success) {
+                    localStorage.setItem('userRole', data.role);
+                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('userName', data.name);
+                    
+                    if (data.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'user.html';
+                    }
                 } else {
-                    activityHtml = '<p style="text-align:center;color:var(--gray);padding:20px">Belum ada produk</p>';
-                }
-                
-                document.getElementById('recentActivity').innerHTML = activityHtml;
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-            }
-        }
-
-        async function loadProducts() {
-            try {
-                const response = await fetch('/api/products');
-                products = await response.json();
-                
-                updateProductSelects();
-                renderProducts();
-            } catch (error) {
-                showNotification('Gagal memuat produk', 'error');
-            }
-        }
-
-        function updateProductSelects() {
-            const selects = [
-                'productSelect', 'codeProductSelect', 'multipleProductSelect', 
-                'viewCodeProductSelect', 'importProductSelect'
-            ];
-            
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                if (select) {
-                    select.innerHTML = '<option value="">Pilih Produk</option>';
-                    products.forEach(product => {
-                        const option = document.createElement('option');
-                        option.value = product.id;
-                        option.textContent = `${product.name} (${product.product_code})`;
-                        select.appendChild(option);
-                    });
-                }
-            });
-        }
-
-        function renderProducts() {
-            const container = document.getElementById('productsList');
-            if (products.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Belum ada produk</p></div>';
-                return;
-            }
-
-            let html = '<table>';
-            html += '<tr><th>Kode</th><th>Nama</th><th>Deskripsi</th><th>Stok</th><th>Akun Tersedia</th><th>Aksi</th></tr>';
-            
-            products.forEach(product => {
-                html += `
-                    <tr>
-                        <td><strong>${product.product_code}</strong></td>
-                        <td><i class="${product.logo || 'fas fa-box'}"></i> ${product.name}</td>
-                        <td>${product.description || '-'}</td>
-                        <td><span class="badge ${product.stock > 0 ? 'success' : 'danger'}">${product.stock}</span></td>
-                        <td><span class="badge ${product.available_accounts > 0 ? 'success' : 'warning'}">${product.available_accounts || 0}</span></td>
-                        <td>
-                            <button class="btn btn-success" style="padding:5px 10px;font-size:0.8rem" onclick="editProduct(${product.id})">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger" style="padding:5px 10px;font-size:0.8rem;margin-left:5px" onclick="deleteProduct(${product.id})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            html += '</table>';
-            container.innerHTML = html;
-        }
-
-        async function loadAccounts(productId) {
-            if (!productId) {
-                document.getElementById('accountsList').innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Pilih produk terlebih dahulu</p></div>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/products/${productId}/accounts`);
-                const accounts = await response.json();
-                
-                const container = document.getElementById('accountsList');
-                if (accounts.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-user-slash"></i><p>Belum ada akun untuk produk ini</p></div>';
-                    return;
-                }
-
-                let html = '<table>';
-                html += '<tr><th>Email</th><th>Password</th><th>Login Via</th><th>Status</th><th>Notes</th><th>Aksi</th></tr>';
-                
-                accounts.forEach(account => {
-                    html += `
-                        <tr>
-                            <td>${account.email}</td>
-                            <td><code>${account.password}</code></td>
-                            <td>${account.login_via}</td>
-                            <td><span class="badge ${account.status === 'available' ? 'success' : account.status === 'reserved' ? 'warning' : 'danger'}">${account.status}</span></td>
-                            <td>${account.notes || '-'}</td>
-                            <td>
-                                <button class="btn btn-danger" style="padding:5px 10px;font-size:0.8rem" onclick="deleteAccount(${account.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += '</table>';
-                container.innerHTML = html;
-            } catch (error) {
-                showNotification('Gagal memuat akun', 'error');
-            }
-        }
-
-        async function loadAvailableAccounts(productId) {
-            try {
-                const response = await fetch(`/api/products/${productId}/available-accounts`);
-                const accounts = await response.json();
-                
-                const select = document.getElementById('accountSelect');
-                select.innerHTML = '<option value="">Pilih Akun</option>';
-                accounts.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.id;
-                    option.textContent = `${account.email} (${account.login_via})`;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Error loading accounts:', error);
-            }
-        }
-
-        async function loadCodes(productId) {
-            if (!productId) {
-                document.getElementById('codesList').innerHTML = '<div class="empty-state"><i class="fas fa-key"></i><p>Pilih produk terlebih dahulu</p></div>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/codes/${productId}`);
-                const codes = await response.json();
-                
-                const container = document.getElementById('codesList');
-                if (codes.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-key"></i><p>Belum ada kode untuk produk ini</p></div>';
-                    return;
-                }
-
-                let html = '';
-                codes.forEach(code => {
-                    html += `
-                        <div class="code-item">
-                            <div>
-                                <div class="code-text">${code.code}</div>
-                                <div style="font-size:0.8rem;color:var(--gray);margin-top:5px">
-                                    ${new Date(code.created_at).toLocaleString()} • 
-                                    ${code.email ? `Akun: ${code.email}` : 'No account'} •
-                                    <span class="${code.used ? 'badge danger' : code.account_status === 'reserved' ? 'badge warning' : 'badge success'}" style="padding:2px 8px">
-                                        ${code.used ? 'Terpakai' : code.account_status === 'reserved' ? 'Reserved' : 'Tersedia'}
-                                    </span>
-                                </div>
-                            </div>
-                            <button class="copy-btn" onclick="copyToClipboard('${code.code}')">
-                                <i class="fas fa-copy"></i> Salin
-                            </button>
-                        </div>
-                    `;
-                });
-                
-                container.innerHTML = html;
-            } catch (error) {
-                showNotification('Gagal memuat kode', 'error');
-            }
-        }
-
-        async function loadMessages() {
-            try {
-                const response = await fetch('/api/messages');
-                const messages = await response.json();
-                
-                const container = document.getElementById('chatMessages');
-                if (messages.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>Belum ada pesan</p></div>';
-                    return;
-                }
-
-                let html = '';
-                messages.slice(0, 20).forEach(msg => {
-                    html += `
-                        <div class="message ${msg.role}">
-                            <div class="message-content">
-                                <div><strong>${msg.username}:</strong> ${msg.message}</div>
-                                <div class="message-time">${new Date(msg.created_at).toLocaleString()}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                container.innerHTML = html;
-                container.scrollTop = container.scrollHeight;
-            } catch (error) {
-                console.error('Error loading messages:', error);
-            }
-        }
-
-        async function loadStats() {
-            try {
-                const response = await fetch('/api/stats');
-                const stats = await response.json();
-                
-                document.getElementById('usedCodes').textContent = stats.usedCodes;
-                document.getElementById('availableCodes').textContent = stats.totalCodes - stats.usedCodes;
-                document.getElementById('usedAccounts').textContent = stats.totalAccounts - stats.availableAccounts;
-                
-                if (chart) chart.destroy();
-                
-                const ctx = document.getElementById('statsChart').getContext('2d');
-                chart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Akun Tersedia', 'Akun Terpakai', 'Kode Tersedia', 'Kode Terpakai'],
-                        datasets: [{
-                            data: [
-                                stats.availableAccounts,
-                                stats.totalAccounts - stats.availableAccounts,
-                                stats.totalCodes - stats.usedCodes,
-                                stats.usedCodes
-                            ],
-                            backgroundColor: [
-                                'rgba(76, 201, 240, 0.7)',
-                                'rgba(247, 37, 133, 0.7)',
-                                'rgba(67, 97, 238, 0.7)',
-                                'rgba(248, 150, 30, 0.7)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification('Kode disalin!', 'success');
-            });
-        }
-
-        function openProductModal(editId = null) {
-            const modal = document.getElementById('productModal');
-            const title = document.getElementById('modalTitle');
-            const form = document.getElementById('productForm');
-            
-            if (editId) {
-                const product = products.find(p => p.id === editId);
-                if (product) {
-                    title.textContent = 'Edit Produk';
-                    document.getElementById('productId').value = product.id;
-                    document.getElementById('productCode').value = product.product_code;
-                    document.getElementById('productName').value = product.name;
-                    document.getElementById('productDescription').value = product.description || '';
-                    document.getElementById('productLogo').value = product.logo || 'fas fa-box';
-                    document.getElementById('productStock').value = product.stock;
-                }
-            } else {
-                title.textContent = 'Tambah Produk Baru';
-                form.reset();
-                document.getElementById('productId').value = '';
-            }
-            
-            modal.style.display = 'flex';
-        }
-
-        function closeProductModal() {
-            document.getElementById('productModal').style.display = 'none';
-            document.getElementById('productForm').reset();
-        }
-
-        function openAccountModal(productId = null) {
-            if (!productId) {
-                productId = document.getElementById('productSelect').value;
-                if (!productId) {
-                    showNotification('Pilih produk terlebih dahulu', 'error');
-                    return;
-                }
-            }
-            
-            document.getElementById('accountProductId').value = productId;
-            document.getElementById('accountModal').style.display = 'flex';
-        }
-
-        function closeAccountModal() {
-            document.getElementById('accountModal').style.display = 'none';
-            document.getElementById('accountForm').reset();
-        }
-
-        function openImportModal() {
-            document.getElementById('importModal').style.display = 'flex';
-        }
-
-        function closeImportModal() {
-            document.getElementById('importModal').style.display = 'none';
-            document.getElementById('importForm').reset();
-        }
-
-        async function addProduct(productData) {
-            try {
-                const response = await fetch('/api/products', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(productData)
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Produk berhasil ditambahkan', 'success');
-                    loadProducts();
-                    loadDashboard();
-                    closeProductModal();
+                    errorMessage.textContent = data.error || 'Login failed';
+                    errorMessage.style.display = 'block';
                 }
             } catch (error) {
-                showNotification('Gagal menambah produk', 'error');
-            }
-        }
-
-        async function updateProduct(id, productData) {
-            try {
-                const response = await fetch(`/api/products/${id}`, {
-                    method: 'PUT',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(productData)
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Produk berhasil diupdate', 'success');
-                    loadProducts();
-                    loadDashboard();
-                    closeProductModal();
-                }
-            } catch (error) {
-                showNotification('Gagal mengupdate produk', 'error');
-            }
-        }
-
-        async function deleteProduct(id) {
-            if (!confirm('Hapus produk ini? Semua akun dan kode terkait juga akan dihapus.')) return;
-            
-            try {
-                const response = await fetch(`/api/products/${id}`, {
-                    method: 'DELETE'
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Produk berhasil dihapus', 'success');
-                    loadProducts();
-                    loadDashboard();
-                }
-            } catch (error) {
-                showNotification('Gagal menghapus produk', 'error');
-            }
-        }
-
-        async function addAccount(accountData) {
-            try {
-                const response = await fetch('/api/accounts', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(accountData)
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Akun berhasil ditambahkan', 'success');
-                    loadAccounts(accountData.product_id);
-                    loadProducts();
-                    loadDashboard();
-                    closeAccountModal();
-                }
-            } catch (error) {
-                showNotification('Gagal menambah akun', 'error');
-            }
-        }
-
-        async function importAccounts(productId, text) {
-            try {
-                const response = await fetch('/api/accounts/import', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ product_id: productId, text })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification(`Berhasil import ${data.imported} akun (${data.failed} gagal)`, 'success');
-                    loadAccounts(productId);
-                    loadProducts();
-                    loadDashboard();
-                    closeImportModal();
-                }
-            } catch (error) {
-                showNotification('Gagal import akun', 'error');
-            }
-        }
-
-        async function deleteAccount(id) {
-            if (!confirm('Hapus akun ini?')) return;
-            
-            try {
-                const response = await fetch(`/api/accounts/${id}`, {
-                    method: 'DELETE'
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Akun berhasil dihapus', 'success');
-                    loadAccounts(currentProductId);
-                    loadProducts();
-                    loadDashboard();
-                }
-            } catch (error) {
-                showNotification('Gagal menghapus akun', 'error');
-            }
-        }
-
-        async function generateCode(productId, accountId, customPrefix) {
-            try {
-                const response = await fetch('/api/codes/generate', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ product_id: productId, account_id: accountId, custom_prefix: customPrefix })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification(`Kode berhasil digenerate: ${data.code}`, 'success');
-                    loadCodes(productId);
-                    loadDashboard();
-                    
-                    if (confirm(`Kode: ${data.code}\n\nSalin ke clipboard?`)) {
-                        copyToClipboard(data.code);
-                    }
-                }
-            } catch (error) {
-                showNotification('Gagal generate kode', 'error');
-            }
-        }
-
-        async function generateMultipleCodes(productId, count, customPrefix) {
-            try {
-                const response = await fetch('/api/codes/generate-multiple', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ product_id: productId, count: count, custom_prefix: customPrefix })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification(`${count} kode berhasil digenerate`, 'success');
-                    loadCodes(productId);
-                    loadDashboard();
-                    
-                    const codesList = data.codes.map(c => c.code).join('\n');
-                    if (confirm(`${count} kode berhasil digenerate!\n\nTampilkan daftar kode?`)) {
-                        alert('Kode yang digenerate:\n\n' + codesList);
-                    }
-                }
-            } catch (error) {
-                showNotification('Gagal generate kode', 'error');
-            }
-        }
-
-        async function sendMessage(message) {
-            try {
-                const response = await fetch('/api/messages', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        user_id: 'broadcast',
-                        username: 'Admin',
-                        message: message,
-                        role: 'admin'
-                    })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Pesan berhasil dikirim', 'success');
-                    loadMessages();
-                    document.getElementById('chatMessage').value = '';
-                }
-            } catch (error) {
-                showNotification('Gagal mengirim pesan', 'error');
-            }
-        }
-
-        function editProduct(id) {
-            openProductModal(id);
-        }
-
-        // Event Listeners
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        });
-
-        document.getElementById('burgerMenu').addEventListener('click', toggleSidebar);
-        document.getElementById('overlay').addEventListener('click', closeSidebar);
-
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const section = item.getAttribute('data-section');
-                switchSection(section);
-            });
-        });
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const tab = this.getAttribute('data-tab');
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                this.classList.add('active');
-                document.getElementById(tab + 'Tab').classList.add('active');
-            });
-        });
-
-        document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
-        document.getElementById('closeProductModal').addEventListener('click', closeProductModal);
-
-        document.getElementById('addAccountBtn').addEventListener('click', () => openAccountModal());
-        document.getElementById('closeAccountModal').addEventListener('click', closeAccountModal);
-
-        document.getElementById('importAccountsBtn').addEventListener('click', openImportModal);
-        document.getElementById('closeImportModal').addEventListener('click', closeImportModal);
-
-        document.getElementById('productSelect').addEventListener('change', function() {
-            currentProductId = this.value;
-            loadAccounts(this.value);
-        });
-
-        document.getElementById('codeProductSelect').addEventListener('change', function() {
-            loadAvailableAccounts(this.value);
-        });
-
-        document.getElementById('viewCodeProductSelect').addEventListener('change', function() {
-            loadCodes(this.value);
-        });
-
-        document.getElementById('productForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const productData = {
-                product_code: document.getElementById('productCode').value,
-                name: document.getElementById('productName').value,
-                description: document.getElementById('productDescription').value,
-                logo: document.getElementById('productLogo').value,
-                stock: parseInt(document.getElementById('productStock').value)
-            };
-            
-            const productId = document.getElementById('productId').value;
-            if (productId) {
-                await updateProduct(productId, productData);
-            } else {
-                await addProduct(productData);
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorMessage.style.display = 'block';
             }
         });
 
-        document.getElementById('accountForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const accountData = {
-                product_id: document.getElementById('accountProductId').value,
-                email: document.getElementById('accountEmail').value,
-                password: document.getElementById('accountPassword').value,
-                login_via: document.getElementById('accountLoginVia').value,
-                notes: document.getElementById('accountNotes').value
-            };
-            
-            await addAccount(accountData);
+        usernameInput.addEventListener('input', () => {
+            errorMessage.style.display = 'none';
         });
 
-        document.getElementById('importForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const productId = document.getElementById('importProductSelect').value;
-            const text = document.getElementById('importText').value;
-            
-            if (!productId) {
-                showNotification('Pilih produk terlebih dahulu', 'error');
-                return;
-            }
-            
-            await importAccounts(productId, text);
+        document.addEventListener('DOMContentLoaded', () => {
+            usernameInput.required = false;
+            usernameInput.placeholder = 'Optional username';
         });
-
-        document.getElementById('generateCodeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const productId = document.getElementById('codeProductSelect').value;
-            const accountId = document.getElementById('accountSelect').value;
-            const customPrefix = document.getElementById('customPrefix').value.trim() || undefined;
-            
-            if (!productId || !accountId) {
-                showNotification('Pilih produk dan akun terlebih dahulu', 'error');
-                return;
-            }
-            
-            await generateCode(productId, accountId, customPrefix);
-        });
-
-        document.getElementById('generateMultipleForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const productId = document.getElementById('multipleProductSelect').value;
-            const count = parseInt(document.getElementById('codeCount').value);
-            const customPrefix = document.getElementById('multipleCustomPrefix').value.trim() || undefined;
-            
-            if (!productId) {
-                showNotification('Pilih produk terlebih dahulu', 'error');
-                return;
-            }
-            
-            if (count < 1 || count > 50) {
-                showNotification('Jumlah kode harus antara 1-50', 'error');
-                return;
-            }
-            
-            await generateMultipleCodes(productId, count, customPrefix);
-        });
-
-        document.getElementById('chatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const message = document.getElementById('chatMessage').value.trim();
-            if (!message) {
-                showNotification('Masukkan pesan terlebih dahulu', 'error');
-                return;
-            }
-            
-            await sendMessage(message);
-        });
-
-        document.getElementById('notificationBtn').addEventListener('click', () => {
-            switchSection('chat');
-        });
-
-        document.getElementById('quickAddProduct').addEventListener('click', () => openProductModal());
-        document.getElementById('quickAddAccount').addEventListener('click', () => openAccountModal());
-        document.getElementById('quickGenerateCode').addEventListener('click', () => switchSection('codes'));
-        document.getElementById('quickCheckMessages').addEventListener('click', () => switchSection('chat'));
-
-        // Load initial data
-        loadDashboard();
-        loadProducts();
-        loadMessages();
-
-        // Auto refresh dashboard every 30 seconds
-        setInterval(loadDashboard, 30000);
-        setInterval(loadMessages, 15000);
     </script>
 </body>
 </html>
