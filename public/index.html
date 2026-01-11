@@ -6,168 +6,108 @@
     <title>Account Manager - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--warning:#f8961e;--dark:#1a1a2e;--light:#f8f9fa;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 30px rgba(0,0,0,0.1);--transition:all 0.3s ease}
-        body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-        .login-container{width:100%;max-width:450px}
-        .login-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:var(--border-radius);padding:40px;box-shadow:var(--box-shadow);animation:slideUp 0.5s ease-out;border:1px solid rgba(255,255,255,0.2)}
-        .logo{text-align:center;margin-bottom:30px}
-        .logo i{font-size:3.5rem;color:var(--primary);margin-bottom:15px;background:linear-gradient(45deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .logo h1{color:var(--dark);font-size:2rem;font-weight:700}
-        .logo p{color:var(--gray);margin-top:10px;font-size:0.9rem}
-        .form-group{margin-bottom:20px}
-        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark);font-size:0.9rem}
-        input{width:100%;padding:15px;border:2px solid var(--gray-light);border-radius:var(--border-radius);font-size:16px;transition:var(--transition);background:white}
-        input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,0.2)}
-        .btn{width:100%;padding:15px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px}
-        .btn-primary{background:linear-gradient(45deg,var(--primary),var(--secondary));color:white;position:relative;overflow:hidden}
-        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(67,97,238,0.3)}
-        .btn-primary:active{transform:translateY(0)}
-        .role-selector{display:flex;gap:10px;margin-bottom:25px}
-        .role-btn{flex:1;padding:12px;border:2px solid var(--gray-light);background:white;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center}
-        .role-btn.active{border-color:var(--primary);background:linear-gradient(45deg,var(--primary),var(--secondary));color:white}
-        .role-btn:hover:not(.active){border-color:var(--primary)}
-        .error-message{background:rgba(247,37,133,0.1);color:var(--danger);padding:12px;border-radius:var(--border-radius);margin-top:20px;text-align:center;display:none;border:1px solid rgba(247,37,133,0.2)}
-        .demo-credentials{margin-top:25px;padding:20px;background:rgba(248,249,250,0.8);border-radius:var(--border-radius);border:1px solid var(--gray-light)}
-        .demo-credentials h4{display:flex;align-items:center;gap:10px;margin-bottom:15px;color:var(--gray)}
-        .credential-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-light)}
-        .credential-item:last-child{border-bottom:none}
-        .credential-role{font-weight:600;color:var(--dark)}
-        .credential-details{color:var(--gray);font-size:0.9rem}
-        .footer{margin-top:25px;text-align:center;color:var(--gray);font-size:0.8rem}
-        @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-        @media(max-width:480px){.login-card{padding:30px 20px}.logo h1{font-size:1.6rem}.role-selector{flex-direction:column}}
+        :root {
+            --primary: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary: #7209b7;
+            --bg-main: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #10b981;
+            --radius: 14px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: radial-gradient(circle at top right, #1e293b, #0f172a); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; color: var(--text-main); }
+
+        .login-card {
+            width: 100%; max-width: 420px; background: var(--bg-card); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: fadeIn 0.6s ease;
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .brand-icon { width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; color: white; }
+        
+        .role-switcher { display: grid; grid-template-columns: 1fr 1fr; background: rgba(15, 23, 42, 0.5); padding: 6px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--glass-border); }
+        .role-btn { padding: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; border-radius: 8px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .role-btn.active { background: var(--primary); color: white; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 16px; color: var(--text-muted); }
+        .input-wrapper input { width: 100%; padding: 14px 16px 14px 48px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--glass-border); border-radius: var(--radius); color: white; transition: 0.3s; }
+        .input-wrapper input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1); }
+
+        .btn-login { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3); }
+
+        .alert { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: #fca5a5; padding: 12px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo">
-                <i class="fas fa-shield-alt"></i>
-                <h1>Account Manager Pro</h1>
-                <p>Secure Account Management System</p>
-            </div>
-
-            <div class="role-selector">
-                <button type="button" class="role-btn active" id="userBtn">
-                    <i class="fas fa-user"></i> User Panel
-                </button>
-                <button type="button" class="role-btn" id="adminBtn">
-                    <i class="fas fa-crown"></i> Admin Panel
-                </button>
-            </div>
-
-            <form id="loginForm">
-                <div class="form-group" id="usernameField">
-                    <label for="username"><i class="fas fa-user-circle"></i> Username</label>
-                    <input type="text" id="username" placeholder="Enter username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-key"></i> Password</label>
-                    <input type="password" id="password" placeholder="Enter password" required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Login as User
-                </button>
-            </form>
-
-            <div class="error-message" id="errorMessage">
-                Invalid credentials. Please try again.
-            </div>
-
-            <div class="demo-credentials">
-                <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
-                <div class="credential-item">
-                    <span class="credential-role">Admin</span>
-                    <span class="credential-details">admin / admin123</span>
-                </div>
-                <div class="credential-item">
-                    <span class="credential-role">User</span>
-                    <span class="credential-details">any / 1</span>
-                </div>
-            </div>
-
-            <div class="footer">
-                <p>© 2024 Account Manager Pro | Secure by Design</p>
-            </div>
+    <div class="login-card">
+        <div class="header">
+            <div class="brand-icon"><i class="fas fa-shield-halved"></i></div>
+            <h1>Welcome</h1>
+            <p style="color: var(--text-muted)">Akses panel manajemen akun</p>
         </div>
+        <div class="role-switcher">
+            <button class="role-btn active" id="userTab"><i class="fas fa-user"></i> User</button>
+            <button class="role-btn" id="adminTab"><i class="fas fa-user-shield"></i> Admin</button>
+        </div>
+        <div id="loginAlert" class="alert"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="username" placeholder="Masukkan username"></div>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper"><i class="fas fa-lock"></i><input type="password" id="password" placeholder="••••••••" required></div>
+            </div>
+            <button type="submit" class="btn-login" id="submitBtn">Login Ke Panel</button>
+        </form>
     </div>
 
     <script>
-        const userBtn = document.getElementById('userBtn');
-        const adminBtn = document.getElementById('adminBtn');
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        const usernameField = document.getElementById('usernameField');
-        const usernameInput = document.getElementById('username');
-        const errorMessage = document.getElementById('errorMessage');
         let currentRole = 'user';
+        const userTab = document.getElementById('userTab');
+        const adminTab = document.getElementById('adminTab');
 
-        userBtn.addEventListener('click', () => {
-            userBtn.classList.add('active');
-            adminBtn.classList.remove('active');
-            currentRole = 'user';
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as User';
-            usernameField.style.display = 'block';
-            usernameInput.required = false;
-            usernameInput.placeholder = 'Optional username';
-        });
+        userTab.onclick = () => { currentRole = 'user'; userTab.classList.add('active'); adminTab.classList.remove('active'); };
+        adminTab.onclick = () => { currentRole = 'admin'; adminTab.classList.add('active'); userTab.classList.remove('active'); };
 
-        adminBtn.addEventListener('click', () => {
-            adminBtn.classList.add('active');
-            userBtn.classList.remove('active');
-            currentRole = 'admin';
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as Admin';
-            usernameField.style.display = 'block';
-            usernameInput.required = true;
-            usernameInput.placeholder = 'Enter admin username';
-        });
-
-        loginForm.addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
-            
-            const username = usernameInput.value;
-            const password = document.getElementById('password').value;
-            
+            const alert = document.getElementById('loginAlert');
             try {
-                const response = await fetch('/api/login', {
+                const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, password, role: currentRole })
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                        role: currentRole
+                    })
                 });
-                
-                const data = await response.json();
-                
+                const data = await res.json();
                 if (data.success) {
                     localStorage.setItem('userRole', data.role);
                     localStorage.setItem('username', data.username);
                     localStorage.setItem('userName', data.name);
-                    
-                    if (data.role === 'admin') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'user.html';
-                    }
+                    window.location.href = data.role === 'admin' ? 'admin.html' : 'user.html';
                 } else {
-                    errorMessage.textContent = data.error || 'Login failed';
-                    errorMessage.style.display = 'block';
+                    alert.style.display = 'block';
+                    alert.textContent = data.error || 'Login Gagal';
                 }
-            } catch (error) {
-                errorMessage.textContent = 'Network error. Please try again.';
-                errorMessage.style.display = 'block';
-            }
-        });
-
-        usernameInput.addEventListener('input', () => {
-            errorMessage.style.display = 'none';
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            usernameInput.required = false;
-            usernameInput.placeholder = 'Optional username';
-        });
+            } catch (err) { alert.style.display = 'block'; alert.textContent = 'Network Error'; }
+        };
     </script>
 </body>
 </html>
