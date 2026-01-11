@@ -7,16 +7,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--warning:#f8961e;--light:#f8f9fa;--dark:#212529;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 20px rgba(0,0,0,0.1);--transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1)}
+        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--warning:#f8961e;--dark:#1a1a2e;--light:#f8f9fa;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 20px rgba(0,0,0,0.1);--transition:all 0.3s cubic-bezier(0.25,0.8,0.25,1)}
         body{background:#f5f7fa;color:var(--dark);min-height:100vh}
-        .navbar{background:white;padding:20px 30px;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center}
+        .navbar{background:white;padding:15px 30px;box-shadow:0 2px 10px rgba(0,0,0,0.1);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000}
+        .navbar-left{display:flex;align-items:center;gap:20px}
+        .burger-menu{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:8px}
+        .burger-line{width:25px;height:3px;background:var(--dark);border-radius:2px;transition:var(--transition)}
         .navbar-brand{display:flex;align-items:center;gap:15px}
         .navbar-brand i{font-size:1.8rem;color:var(--primary)}
-        .navbar-brand h1{font-size:1.5rem;color:var(--dark)}
+        .navbar-brand h1{font-size:1.5rem;color:var(--dark);font-weight:700}
         .user-info{display:flex;align-items:center;gap:15px}
+        .notification-badge{position:relative}
+        .notification-btn{background:none;border:none;font-size:1.3rem;color:var(--gray);cursor:pointer;padding:8px;position:relative}
+        .badge-count{position:absolute;top:0;right:0;background:var(--danger);color:white;font-size:0.7rem;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
         .logout-btn{background:var(--danger);color:white;border:none;padding:8px 20px;border-radius:var(--border-radius);cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:600;transition:var(--transition)}
         .logout-btn:hover{background:#e11570;transform:translateY(-2px)}
-        .container{max-width:1400px;margin:0 auto;padding:30px}
+        .container{display:flex;min-height:calc(100vh - 70px)}
+        .sidebar{width:280px;background:white;padding:25px 0;box-shadow:2px 0 10px rgba(0,0,0,0.1);transition:var(--transition)}
+        .sidebar-menu{padding:0 20px}
+        .menu-item{display:flex;align-items:center;gap:15px;padding:15px;margin-bottom:10px;border-radius:var(--border-radius);cursor:pointer;transition:var(--transition);color:var(--gray);text-decoration:none}
+        .menu-item:hover{background:var(--gray-light);color:var(--primary)}
+        .menu-item.active{background:var(--primary);color:white}
+        .menu-item i{font-size:1.2rem;width:24px}
+        .menu-item span{font-weight:600}
+        .main-content{flex:1;padding:30px;overflow-y:auto}
         .dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;margin-bottom:40px}
         .stat-card{background:white;border-radius:var(--border-radius);padding:25px;box-shadow:var(--box-shadow);transition:var(--transition)}
         .stat-card:hover{transform:translateY(-5px);box-shadow:0 15px 30px rgba(0,0,0,0.15)}
@@ -24,17 +38,12 @@
         .stat-icon.primary{background:rgba(67,97,238,0.1);color:var(--primary)}
         .stat-icon.success{background:rgba(76,201,240,0.1);color:var(--success)}
         .stat-icon.warning{background:rgba(248,150,30,0.1);color:var(--warning)}
+        .stat-icon.danger{background:rgba(247,37,133,0.1);color:var(--danger)}
         .stat-value{font-size:2.2rem;font-weight:700;margin-bottom:5px}
         .stat-label{color:var(--gray);font-size:0.9rem}
-        .tabs{display:flex;gap:10px;margin-bottom:30px;background:white;padding:10px;border-radius:var(--border-radius);box-shadow:var(--box-shadow)}
-        .tab-btn{padding:12px 25px;border:none;background:none;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition)}
-        .tab-btn.active{background:var(--primary);color:white}
-        .tab-btn:hover:not(.active){background:var(--gray-light)}
-        .tab-content{display:none;animation:fadeIn 0.3s ease-out}
-        .tab-content.active{display:block}
         .card{background:white;border-radius:var(--border-radius);padding:30px;box-shadow:var(--box-shadow);margin-bottom:30px}
-        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
-        .card-header h2{color:var(--primary);font-size:1.5rem}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:15px}
+        .card-header h2{color:var(--primary);font-size:1.5rem;font-weight:700}
         .btn{padding:12px 24px;border:none;border-radius:var(--border-radius);font-size:15px;font-weight:600;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px}
         .btn-primary{background-color:var(--primary);color:white}
         .btn-primary:hover{background-color:var(--primary-dark);transform:translateY(-2px)}
@@ -52,6 +61,7 @@
         .badge.success{background:rgba(76,201,240,0.1);color:var(--success)}
         .badge.danger{background:rgba(247,37,133,0.1);color:var(--danger)}
         .badge.warning{background:rgba(248,150,30,0.1);color:var(--warning)}
+        .badge.info{background:rgba(67,97,238,0.1);color:var(--primary)}
         .form-group{margin-bottom:20px}
         label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark)}
         input,select,textarea{width:100%;padding:12px 15px;border:2px solid var(--gray-light);border-radius:var(--border-radius);font-size:15px;transition:var(--transition)}
@@ -67,120 +77,347 @@
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
         @keyframes slideInRight{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
         .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:25px}
-        @media(max-width:992px){.grid-2{grid-template-columns:1fr}.container{padding:20px}}
         .code-list{max-height:400px;overflow-y:auto}
         .code-item{background:var(--gray-light);padding:12px 15px;border-radius:var(--border-radius);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-        .code-text{font-family:monospace;font-weight:600}
+        .code-text{font-family:monospace;font-weight:600;font-size:0.9rem}
         .copy-btn{background:var(--primary);color:white;border:none;padding:5px 15px;border-radius:var(--border-radius);cursor:pointer;font-size:0.8rem}
+        .chat-container{max-height:400px;overflow-y:auto;padding:15px;background:var(--light);border-radius:var(--border-radius);margin-bottom:20px}
+        .message{margin-bottom:15px;max-width:80%}
+        .message.user{margin-left:auto}
+        .message.admin{margin-right:auto}
+        .message-content{padding:12px 15px;border-radius:var(--border-radius);box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+        .message.user .message-content{background:var(--primary);color:white}
+        .message.admin .message-content{background:var(--gray-light);color:var(--dark)}
+        .message-time{font-size:0.8rem;color:var(--gray);margin-top:5px}
+        .empty-state{text-align:center;padding:40px;color:var(--gray)}
+        .empty-state i{font-size:3rem;margin-bottom:15px;color:#e9ecef}
+        .tab-navigation{display:flex;gap:10px;margin-bottom:30px;background:white;padding:10px;border-radius:var(--border-radius);box-shadow:var(--box-shadow);flex-wrap:wrap}
+        .tab-btn{padding:12px 25px;border:none;background:none;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition)}
+        .tab-btn.active{background:var(--primary);color:white}
+        .tab-btn:hover:not(.active){background:var(--gray-light)}
+        .section{display:none;animation:fadeIn 0.3s ease-out}
+        .section.active{display:block}
+        .overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999}
+        @media(max-width:992px){.grid-2{grid-template-columns:1fr}.container{padding:0}.main-content{padding:20px 15px}}
+        @media(max-width:768px){.burger-menu{display:flex}.sidebar{position:fixed;left:-280px;top:70px;height:calc(100vh - 70px);z-index:1000}.sidebar.active{left:0}.overlay.active{display:block}.navbar-brand h1{font-size:1.2rem}.card-header{flex-direction:column;align-items:flex-start}.tab-navigation{overflow-x:auto;flex-wrap:nowrap}.tab-btn{padding:10px 15px;font-size:0.9rem}}
+        @media(max-width:480px){.stat-card{padding:20px}.card{padding:20px}.btn{padding:10px 15px;font-size:14px}}
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar-brand">
-            <i class="fas fa-lock"></i>
-            <h1>Account Manager - Admin Panel</h1>
+        <div class="navbar-left">
+            <div class="burger-menu" id="burgerMenu">
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+                <div class="burger-line"></div>
+            </div>
+            <div class="navbar-brand">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Admin Panel</h1>
+            </div>
         </div>
         <div class="user-info">
-            <span><strong>Admin</strong></span>
+            <div class="notification-badge">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge-count" id="unreadCount">0</span>
+                </button>
+            </div>
+            <span><strong id="adminName">Administrator</strong></span>
             <button class="logout-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
     </nav>
 
+    <div class="overlay" id="overlay"></div>
+
     <div class="container">
-        <div class="dashboard">
-            <div class="stat-card">
-                <div class="stat-icon primary">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" data-section="products">
                     <i class="fas fa-box"></i>
-                </div>
-                <div class="stat-value" id="totalProducts">0</div>
-                <div class="stat-label">Total Produk</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon success">
-                    <i class="fas fa-user-check"></i>
-                </div>
-                <div class="stat-value" id="totalAccounts">0</div>
-                <div class="stat-label">Total Akun Tersedia</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon warning">
+                    <span>Produk</span>
+                </a>
+                <a href="#" class="menu-item" data-section="accounts">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Akun</span>
+                </a>
+                <a href="#" class="menu-item" data-section="codes">
                     <i class="fas fa-key"></i>
-                </div>
-                <div class="stat-value" id="totalCodes">0</div>
-                <div class="stat-label">Kode Tersedia</div>
+                    <span>Kode</span>
+                </a>
+                <a href="#" class="menu-item" data-section="chat">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat</span>
+                    <span class="badge danger" id="chatBadge" style="margin-left:auto;display:none">0</span>
+                </a>
+                <a href="#" class="menu-item" data-section="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistik</span>
+                </a>
+                <a href="#" class="menu-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
             </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="products">Produk</button>
-            <button class="tab-btn" data-tab="accounts">Akun</button>
-            <button class="tab-btn" data-tab="codes">Kode Produk</button>
-        </div>
-
-        <div class="tab-content active" id="productsTab">
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-box"></i> Daftar Produk</h2>
-                    <button class="btn btn-primary" id="addProductBtn">
-                        <i class="fas fa-plus"></i> Tambah Produk
-                    </button>
-                </div>
-                <div id="productsList"></div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="accountsTab">
-            <div class="card">
-                <div class="card-header">
-                    <h2><i class="fas fa-user-shield"></i> Kelola Akun</h2>
-                    <div>
-                        <select id="productSelect" style="width:200px;margin-right:15px">
-                            <option value="">Pilih Produk</option>
-                        </select>
-                        <button class="btn btn-primary" id="addAccountBtn">
-                            <i class="fas fa-plus"></i> Tambah Akun
-                        </button>
+        <div class="main-content">
+            <div class="section active" id="dashboardSection">
+                <h2 style="margin-bottom:30px;color:var(--primary)"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <div class="dashboard">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-value" id="totalProducts">0</div>
+                        <div class="stat-label">Total Produk</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-value" id="totalAccounts">0</div>
+                        <div class="stat-label">Total Akun</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="stat-value" id="availableAccounts">0</div>
+                        <div class="stat-label">Akun Tersedia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="stat-value" id="totalCodes">0</div>
+                        <div class="stat-label">Kode Dibuat</div>
                     </div>
                 </div>
-                <div id="accountsList"></div>
-            </div>
-        </div>
 
-        <div class="tab-content" id="codesTab">
-            <div class="grid-2">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:15px">
+                            <button class="btn btn-primary" id="quickAddProduct">
+                                <i class="fas fa-plus"></i> Produk Baru
+                            </button>
+                            <button class="btn btn-success" id="quickAddAccount">
+                                <i class="fas fa-user-plus"></i> Tambah Akun
+                            </button>
+                            <button class="btn btn-warning" id="quickGenerateCode">
+                                <i class="fas fa-key"></i> Generate Kode
+                            </button>
+                            <button class="btn btn-primary" id="quickCheckMessages">
+                                <i class="fas fa-comments"></i> Cek Pesan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-history"></i> Aktivitas Terbaru</h2>
+                        </div>
+                        <div id="recentActivity">
+                            <p style="text-align:center;color:var(--gray);padding:20px">Memuat aktivitas...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="productsSection">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-key"></i> Generate Kode</h2>
+                        <h2><i class="fas fa-box"></i> Kelola Produk</h2>
+                        <button class="btn btn-primary" id="addProductBtn">
+                            <i class="fas fa-plus"></i> Tambah Produk
+                        </button>
                     </div>
-                    <form id="generateCodeForm">
-                        <div class="form-group">
-                            <label>Pilih Produk</label>
-                            <select id="codeProductSelect" required>
+                    <div id="productsList"></div>
+                </div>
+            </div>
+
+            <div class="section" id="accountsSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user-shield"></i> Kelola Akun</h2>
+                        <div style="display:flex;gap:15px;flex-wrap:wrap">
+                            <select id="productSelect" style="min-width:200px">
+                                <option value="">Pilih Produk</option>
+                            </select>
+                            <button class="btn btn-primary" id="addAccountBtn">
+                                <i class="fas fa-plus"></i> Tambah Akun
+                            </button>
+                            <button class="btn btn-success" id="importAccountsBtn">
+                                <i class="fas fa-file-import"></i> Import Bulk
+                            </button>
+                        </div>
+                    </div>
+                    <div id="accountsList"></div>
+                </div>
+            </div>
+
+            <div class="section" id="codesSection">
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="generate">Generate Kode</button>
+                    <button class="tab-btn" data-tab="manage">Kelola Kode</button>
+                </div>
+                <div class="section active" id="generateTab">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-key"></i> Generate Single Code</h2>
+                            </div>
+                            <form id="generateCodeForm">
+                                <div class="form-group">
+                                    <label>Pilih Produk</label>
+                                    <select id="codeProductSelect" required>
+                                        <option value="">Pilih Produk</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pilih Akun</label>
+                                    <select id="accountSelect" required>
+                                        <option value="">Pilih Akun</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Custom Prefix (opsional)</label>
+                                    <input type="text" id="customPrefix" placeholder="AMP" maxlength="6">
+                                    <small style="color:var(--gray);font-size:0.8rem">Contoh: AMP-UWGSG1726</small>
+                                </div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-bolt"></i> Generate Kode
+                                </button>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-layer-group"></i> Generate Multiple Codes</h2>
+                            </div>
+                            <form id="generateMultipleForm">
+                                <div class="form-group">
+                                    <label>Pilih Produk</label>
+                                    <select id="multipleProductSelect" required>
+                                        <option value="">Pilih Produk</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Jumlah Kode</label>
+                                    <input type="number" id="codeCount" min="1" max="50" value="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Custom Prefix (opsional)</label>
+                                    <input type="text" id="multipleCustomPrefix" placeholder="AMP" maxlength="6">
+                                </div>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-bolt"></i> Generate Multiple
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="section" id="manageTab">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-list"></i> Daftar Kode</h2>
+                            <select id="viewCodeProductSelect" style="min-width:200px">
                                 <option value="">Pilih Produk</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Jumlah Kode</label>
-                            <input type="number" id="codeCount" min="1" max="100" value="5" required>
+                        <div class="code-list" id="codesList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="chatSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-comments"></i> Chat dengan Users</h2>
+                    </div>
+                    <div class="chat-container" id="chatMessages">
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <p>Memuat pesan...</p>
                         </div>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-bolt"></i> Generate Kode
+                    </div>
+                    <form id="chatForm">
+                        <div class="form-group">
+                            <label>Kirim Pesan ke Semua User</label>
+                            <textarea id="chatMessage" rows="3" placeholder="Tulis pesan broadcast..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Kirim Pesan
                         </button>
                     </form>
                 </div>
+            </div>
+
+            <div class="section" id="statsSection">
                 <div class="card">
                     <div class="card-header">
-                        <h2><i class="fas fa-list"></i> Kode yang Digenerate</h2>
+                        <h2><i class="fas fa-chart-bar"></i> Statistik Detail</h2>
                     </div>
-                    <div class="form-group">
-                        <label>Pilih Produk</label>
-                        <select id="viewCodeProductSelect" required>
-                            <option value="">Pilih Produk</option>
-                        </select>
+                    <div class="grid-2">
+                        <div id="chartContainer">
+                            <canvas id="statsChart" width="400" height="300"></canvas>
+                        </div>
+                        <div>
+                            <div class="stat-card" style="margin-bottom:15px">
+                                <div class="stat-value" id="usedCodes">0</div>
+                                <div class="stat-label">Kode Terpakai</div>
+                            </div>
+                            <div class="stat-card" style="margin-bottom:15px">
+                                <div class="stat-value" id="availableCodes">0</div>
+                                <div class="stat-label">Kode Tersedia</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="usedAccounts">0</div>
+                                <div class="stat-label">Akun Terpakai</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="code-list" id="codesList"></div>
+                </div>
+            </div>
+
+            <div class="section" id="settingsSection">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-cog"></i> Pengaturan</h2>
+                    </div>
+                    <div class="grid-2">
+                        <div>
+                            <h3 style="margin-bottom:20px;color:var(--primary)"><i class="fas fa-user-cog"></i> Admin Settings</h3>
+                            <div class="form-group">
+                                <label>Username Admin</label>
+                                <input type="text" value="admin" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Password User Default</label>
+                                <input type="text" value="1" disabled>
+                            </div>
+                            <button class="btn btn-primary" onclick="showNotification('Settings saved!', 'success')">
+                                <i class="fas fa-save"></i> Simpan Pengaturan
+                            </button>
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom:20px;color:var(--primary)"><i class="fas fa-info-circle"></i> System Info</h3>
+                            <div style="background:var(--light);padding:20px;border-radius:var(--border-radius)">
+                                <p><strong>Versi:</strong> 2.0.0</p>
+                                <p><strong>Database:</strong> SQLite</p>
+                                <p><strong>Status:</strong> <span class="badge success">Online</span></p>
+                                <p><strong>Server:</strong> Vercel</p>
+                                <p><strong>API Endpoints:</strong> Active</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -205,6 +442,10 @@
                 <div class="form-group">
                     <label>Deskripsi</label>
                     <textarea id="productDescription" rows="3" placeholder="Akun Netflix Premium 4K UHD"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Icon (FontAwesome)</label>
+                    <input type="text" id="productLogo" placeholder="fas fa-film" value="fas fa-box">
                 </div>
                 <div class="form-group">
                     <label>Stok Awal</label>
@@ -245,6 +486,10 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Notes (opsional)</label>
+                    <textarea id="accountNotes" rows="2" placeholder="Additional information"></textarea>
+                </div>
+                <div class="form-group">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Simpan Akun
                     </button>
@@ -253,80 +498,348 @@
         </div>
     </div>
 
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Import Akun Bulk</h3>
+                <button class="close-modal" id="closeImportModal">&times;</button>
+            </div>
+            <form id="importForm">
+                <div class="form-group">
+                    <label>Pilih Produk</label>
+                    <select id="importProductSelect" required>
+                        <option value="">Pilih Produk</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Format: email|password|login_via</label>
+                    <textarea id="importText" rows="10" placeholder="user1@example.com|pass123|Email
+user2@example.com|pass456|Facebook
+user3@example.com|pass789|Google" required></textarea>
+                    <small style="color:var(--gray);font-size:0.8rem">Satu akun per baris. Login via opsional (default: Email)</small>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-file-import"></i> Import Akun
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="notification" id="notification"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const userRole = localStorage.getItem('userRole');
-        if (!userRole || userRole !== 'admin') {
-            window.location.href = 'index.html';
+        // ============ GLOBAL VARIABLES ============
+        let products = [];
+        let currentProductId = null;
+        let chart = null;
+        let currentTab = 'generate';
+
+        // ============ INITIALIZATION ============
+        document.addEventListener('DOMContentLoaded', function() {
+            const userRole = localStorage.getItem('userRole');
+            if (!userRole || userRole !== 'admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const adminName = localStorage.getItem('userName') || 'Administrator';
+            document.getElementById('adminName').textContent = adminName;
+
+            initializeEventListeners();
+            loadInitialData();
+        });
+
+        // ============ EVENT LISTENERS ============
+        function initializeEventListeners() {
+            // Navigation
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('burgerMenu').addEventListener('click', toggleSidebar);
+            document.getElementById('overlay').addEventListener('click', closeSidebar);
+            document.getElementById('notificationBtn').addEventListener('click', () => switchSection('chat'));
+
+            // Menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = item.getAttribute('data-section');
+                    switchSection(section);
+                });
+            });
+
+            // Tab navigation
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+
+            // Product management
+            document.getElementById('addProductBtn').addEventListener('click', () => openProductModal());
+            document.getElementById('closeProductModal').addEventListener('click', closeProductModal);
+            document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
+
+            // Account management
+            document.getElementById('addAccountBtn').addEventListener('click', () => openAccountModal());
+            document.getElementById('closeAccountModal').addEventListener('click', closeAccountModal);
+            document.getElementById('accountForm').addEventListener('submit', handleAccountSubmit);
+            document.getElementById('productSelect').addEventListener('change', handleProductSelectChange);
+            
+            // Import accounts
+            document.getElementById('importAccountsBtn').addEventListener('click', openImportModal);
+            document.getElementById('closeImportModal').addEventListener('click', closeImportModal);
+            document.getElementById('importForm').addEventListener('submit', handleImportSubmit);
+
+            // Code generation
+            document.getElementById('codeProductSelect').addEventListener('change', handleCodeProductSelectChange);
+            document.getElementById('viewCodeProductSelect').addEventListener('change', handleViewCodeProductSelectChange);
+            document.getElementById('generateCodeForm').addEventListener('submit', handleGenerateCodeSubmit);
+            document.getElementById('generateMultipleForm').addEventListener('submit', handleGenerateMultipleSubmit);
+
+            // Chat
+            document.getElementById('chatForm').addEventListener('submit', handleChatSubmit);
+
+            // Quick actions
+            document.getElementById('quickAddProduct').addEventListener('click', () => openProductModal());
+            document.getElementById('quickAddAccount').addEventListener('click', () => openAccountModal());
+            document.getElementById('quickGenerateCode').addEventListener('click', () => switchSection('codes'));
+            document.getElementById('quickCheckMessages').addEventListener('click', () => switchSection('chat'));
         }
 
-        let currentProductId = null;
-        let products = [];
+        // ============ NAVIGATION ============
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const burger = document.getElementById('burgerMenu');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            burger.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const burger = document.getElementById('burgerMenu');
+            
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            burger.classList.remove('active');
+        }
+
+        function switchSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            // Show selected section
+            const sectionElement = document.getElementById(sectionId + 'Section');
+            if (sectionElement) {
+                sectionElement.classList.add('active');
+                document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
+                
+                // Load section data
+                if (sectionId === 'dashboard') {
+                    loadDashboard();
+                } else if (sectionId === 'products') {
+                    loadProducts();
+                } else if (sectionId === 'accounts') {
+                    loadAccounts(currentProductId);
+                } else if (sectionId === 'codes') {
+                    loadCodes(currentProductId);
+                } else if (sectionId === 'chat') {
+                    loadMessages();
+                } else if (sectionId === 'stats') {
+                    loadStats();
+                }
+            }
+            
+            closeSidebar();
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId + 'Tab').classList.add('active');
+            
+            if (tabId === 'manage') {
+                loadCodes(document.getElementById('viewCodeProductSelect').value);
+            }
+        }
+
+        // ============ LOAD DATA FUNCTIONS ============
+        function loadInitialData() {
+            loadDashboard();
+            loadProducts();
+            loadMessages();
+            
+            // Auto refresh every 30 seconds
+            setInterval(loadDashboard, 30000);
+            setInterval(loadMessages, 15000);
+        }
+
+        async function loadDashboard() {
+            try {
+                const [productsRes, statsRes, messagesRes] = await Promise.all([
+                    fetch('/api/products'),
+                    fetch('/api/stats'),
+                    fetch('/api/messages/unread/count')
+                ]);
+                
+                if (!productsRes.ok || !statsRes.ok || !messagesRes.ok) {
+                    throw new Error('Failed to fetch dashboard data');
+                }
+                
+                const productsData = await productsRes.json();
+                const statsData = await statsRes.json();
+                const messagesData = await messagesRes.json();
+                
+                // Update stats
+                document.getElementById('totalProducts').textContent = statsData.products || 0;
+                document.getElementById('totalAccounts').textContent = statsData.totalAccounts || 0;
+                document.getElementById('availableAccounts').textContent = statsData.availableAccounts || 0;
+                document.getElementById('totalCodes').textContent = statsData.totalCodes || 0;
+                
+                // Update notifications
+                const unreadCount = messagesData.count || 0;
+                document.getElementById('unreadCount').textContent = unreadCount;
+                document.getElementById('chatBadge').textContent = unreadCount;
+                document.getElementById('chatBadge').style.display = unreadCount > 0 ? 'inline-block' : 'none';
+                
+                // Update recent activity
+                updateRecentActivity(productsData);
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showNotification('Gagal memuat dashboard', 'error');
+            }
+        }
+
+        function updateRecentActivity(productsData) {
+            const container = document.getElementById('recentActivity');
+            if (!container) return;
+            
+            if (!productsData || productsData.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:20px">Belum ada aktivitas</p>';
+                return;
+            }
+            
+            const recentProducts = productsData.slice(0, 5);
+            let html = '';
+            
+            recentProducts.forEach(product => {
+                html += `
+                    <div style="padding:10px;border-bottom:1px solid var(--gray-light);display:flex;justify-content:space-between;align-items:center">
+                        <div>
+                            <div style="font-weight:600">${product.name}</div>
+                            <div style="font-size:0.9rem;color:var(--gray)">
+                                ${product.product_code} • ${product.available_accounts || 0} akun tersedia
+                            </div>
+                        </div>
+                        <span class="badge ${product.stock > 0 ? 'success' : 'danger'}">
+                            ${product.stock} stok
+                        </span>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
 
         async function loadProducts() {
             try {
                 const response = await fetch('/api/products');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch products');
+                }
+                
                 products = await response.json();
-                
-                document.getElementById('totalProducts').textContent = products.length;
-                
-                let totalAccounts = 0;
-                products.forEach(p => totalAccounts += p.available_accounts);
-                document.getElementById('totalAccounts').textContent = totalAccounts;
-                
                 updateProductSelects();
                 renderProducts();
-                updateStats();
+                
             } catch (error) {
+                console.error('Error loading products:', error);
                 showNotification('Gagal memuat produk', 'error');
-            }
-        }
-
-        async function updateStats() {
-            try {
-                const codesResponse = await fetch(`/api/codes/${currentProductId || ''}`);
-                const codes = await codesResponse.json();
-                document.getElementById('totalCodes').textContent = codes.filter(c => !c.used).length;
-            } catch (error) {
-                console.error('Error updating stats:', error);
+                renderProducts(); // Render empty state
             }
         }
 
         function updateProductSelects() {
-            const productSelect = document.getElementById('productSelect');
-            const codeProductSelect = document.getElementById('codeProductSelect');
-            const viewCodeProductSelect = document.getElementById('viewCodeProductSelect');
+            const selects = [
+                'productSelect', 'codeProductSelect', 'multipleProductSelect', 
+                'viewCodeProductSelect', 'importProductSelect'
+            ];
             
-            [productSelect, codeProductSelect, viewCodeProductSelect].forEach(select => {
-                select.innerHTML = '<option value="">Pilih Produk</option>';
-                products.forEach(product => {
-                    const option = document.createElement('option');
-                    option.value = product.id;
-                    option.textContent = `${product.name} (${product.product_code})`;
-                    select.appendChild(option);
-                });
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">Pilih Produk</option>';
+                    products.forEach(product => {
+                        const option = document.createElement('option');
+                        option.value = product.id;
+                        option.textContent = `${product.name} (${product.product_code})`;
+                        select.appendChild(option);
+                    });
+                }
             });
         }
 
         function renderProducts() {
             const container = document.getElementById('productsList');
-            if (products.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:40px">Belum ada produk</p>';
+            if (!container) return;
+            
+            if (!products || products.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <p>Belum ada produk</p>
+                        <button class="btn btn-primary" onclick="openProductModal()" style="margin-top:15px">
+                            <i class="fas fa-plus"></i> Tambah Produk Pertama
+                        </button>
+                    </div>
+                `;
                 return;
             }
 
             let html = '<table>';
-            html += '<tr><th>Kode</th><th>Nama</th><th>Deskripsi</th><th>Stok</th><th>Akun Tersedia</th><th>Aksi</th></tr>';
+            html += '<thead><tr>';
+            html += '<th>Kode</th>';
+            html += '<th>Nama</th>';
+            html += '<th>Deskripsi</th>';
+            html += '<th>Stok</th>';
+            html += '<th>Akun Tersedia</th>';
+            html += '<th>Total Akun</th>';
+            html += '<th>Aksi</th>';
+            html += '</tr></thead>';
+            html += '<tbody>';
             
             products.forEach(product => {
                 html += `
                     <tr>
                         <td><strong>${product.product_code}</strong></td>
-                        <td>${product.name}</td>
+                        <td><i class="${product.logo || 'fas fa-box'}"></i> ${product.name}</td>
                         <td>${product.description || '-'}</td>
-                        <td><span class="badge ${product.stock > 0 ? 'success' : 'danger'}">${product.stock}</span></td>
-                        <td>${product.available_accounts || 0}</td>
+                        <td>
+                            <span class="badge ${product.stock > 0 ? 'success' : 'danger'}">
+                                ${product.stock}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${product.available_accounts > 0 ? 'success' : 'warning'}">
+                                ${product.available_accounts || 0}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge info">
+                                ${product.total_accounts || 0}
+                            </span>
+                        </td>
                         <td>
                             <button class="btn btn-success" style="padding:5px 10px;font-size:0.8rem" onclick="editProduct(${product.id})">
                                 <i class="fas fa-edit"></i>
@@ -339,36 +852,69 @@
                 `;
             });
             
-            html += '</table>';
+            html += '</tbody></table>';
             container.innerHTML = html;
         }
 
         async function loadAccounts(productId) {
+            const container = document.getElementById('accountsList');
+            if (!container) return;
+            
             if (!productId) {
-                document.getElementById('accountsList').innerHTML = '<p style="text-align:center;color:var(--gray);padding:40px">Pilih produk terlebih dahulu</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <p>Pilih produk terlebih dahulu</p>
+                    </div>
+                `;
                 return;
             }
 
             try {
                 const response = await fetch(`/api/products/${productId}/accounts`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch accounts');
+                }
+                
                 const accounts = await response.json();
                 
-                const container = document.getElementById('accountsList');
-                if (accounts.length === 0) {
-                    container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:40px">Belum ada akun untuk produk ini</p>';
+                if (!accounts || accounts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <p>Belum ada akun untuk produk ini</p>
+                            <button class="btn btn-primary" onclick="openAccountModal(${productId})" style="margin-top:15px">
+                                <i class="fas fa-plus"></i> Tambah Akun Pertama
+                            </button>
+                        </div>
+                    `;
                     return;
                 }
 
                 let html = '<table>';
-                html += '<tr><th>Email</th><th>Password</th><th>Login Via</th><th>Status</th><th>Aksi</th></tr>';
+                html += '<thead><tr>';
+                html += '<th>Email</th>';
+                html += '<th>Password</th>';
+                html += '<th>Login Via</th>';
+                html += '<th>Status</th>';
+                html += '<th>Notes</th>';
+                html += '<th>Aksi</th>';
+                html += '</tr></thead>';
+                html += '<tbody>';
                 
                 accounts.forEach(account => {
+                    let statusClass = 'info';
+                    if (account.status === 'available') statusClass = 'success';
+                    else if (account.status === 'reserved') statusClass = 'warning';
+                    else if (account.status === 'used') statusClass = 'danger';
+                    
                     html += `
                         <tr>
                             <td>${account.email}</td>
                             <td><code>${account.password}</code></td>
                             <td>${account.login_via}</td>
-                            <td><span class="badge ${account.status === 'available' ? 'success' : 'danger'}">${account.status}</span></td>
+                            <td><span class="badge ${statusClass}">${account.status}</span></td>
+                            <td>${account.notes || '-'}</td>
                             <td>
                                 <button class="btn btn-danger" style="padding:5px 10px;font-size:0.8rem" onclick="deleteAccount(${account.id})">
                                     <i class="fas fa-trash"></i>
@@ -378,39 +924,104 @@
                     `;
                 });
                 
-                html += '</table>';
+                html += '</tbody></table>';
                 container.innerHTML = html;
+                
             } catch (error) {
-                showNotification('Gagal memuat akun', 'error');
+                console.error('Error loading accounts:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Gagal memuat akun</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadAvailableAccounts(productId) {
+            if (!productId) return;
+            
+            try {
+                const response = await fetch(`/api/products/${productId}/available-accounts`);
+                if (!response.ok) return;
+                
+                const accounts = await response.json();
+                const select = document.getElementById('accountSelect');
+                
+                if (!select) return;
+                
+                select.innerHTML = '<option value="">Pilih Akun</option>';
+                if (accounts && accounts.length > 0) {
+                    accounts.forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account.id;
+                        option.textContent = `${account.email} (${account.login_via})`;
+                        select.appendChild(option);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading available accounts:', error);
             }
         }
 
         async function loadCodes(productId) {
+            const container = document.getElementById('codesList');
+            if (!container) return;
+            
             if (!productId) {
-                document.getElementById('codesList').innerHTML = '<p style="text-align:center;color:var(--gray);padding:20px">Pilih produk terlebih dahulu</p>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-key"></i>
+                        <p>Pilih produk terlebih dahulu</p>
+                    </div>
+                `;
                 return;
             }
 
             try {
                 const response = await fetch(`/api/codes/${productId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch codes');
+                }
+                
                 const codes = await response.json();
                 
-                const container = document.getElementById('codesList');
-                if (codes.length === 0) {
-                    container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:20px">Belum ada kode untuk produk ini</p>';
+                if (!codes || codes.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-key"></i>
+                            <p>Belum ada kode untuk produk ini</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 let html = '';
                 codes.forEach(code => {
+                    let statusClass = 'info';
+                    let statusText = 'Unknown';
+                    
+                    if (code.used) {
+                        statusClass = 'danger';
+                        statusText = 'Terpakai';
+                    } else if (code.account_status === 'reserved') {
+                        statusClass = 'warning';
+                        statusText = 'Reserved';
+                    } else if (code.account_status === 'available') {
+                        statusClass = 'success';
+                        statusText = 'Tersedia';
+                    }
+                    
                     html += `
                         <div class="code-item">
                             <div>
                                 <div class="code-text">${code.code}</div>
                                 <div style="font-size:0.8rem;color:var(--gray);margin-top:5px">
                                     ${new Date(code.created_at).toLocaleString()} • 
-                                    <span class="${code.used ? 'badge danger' : 'badge success'}" style="padding:2px 8px">
-                                        ${code.used ? 'Terpakai' : 'Tersedia'}
+                                    ${code.email ? `Akun: ${code.email}` : 'No account'} •
+                                    <span class="badge ${statusClass}" style="padding:2px 8px">
+                                        ${statusText}
                                     </span>
                                 </div>
                             </div>
@@ -422,58 +1033,452 @@
                 });
                 
                 container.innerHTML = html;
-                updateStats();
+                
             } catch (error) {
-                showNotification('Gagal memuat kode', 'error');
+                console.error('Error loading codes:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Gagal memuat kode</p>
+                    </div>
+                `;
             }
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showNotification('Kode disalin!', 'success');
-            });
+        async function loadMessages() {
+            try {
+                const response = await fetch('/api/messages');
+                if (!response.ok) return;
+                
+                const messages = await response.json();
+                const container = document.getElementById('chatMessages');
+                
+                if (!container) return;
+                
+                if (!messages || messages.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <p>Belum ada pesan</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                messages.slice(0, 20).forEach(msg => {
+                    html += `
+                        <div class="message ${msg.role}">
+                            <div class="message-content">
+                                <div><strong>${msg.username}:</strong> ${msg.message}</div>
+                                <div class="message-time">${new Date(msg.created_at).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                container.scrollTop = container.scrollHeight;
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
         }
 
-        async function addProduct(productData) {
+        async function loadStats() {
             try {
-                const response = await fetch('/api/products', {
+                const response = await fetch('/api/stats');
+                if (!response.ok) return;
+                
+                const stats = await response.json();
+                
+                document.getElementById('usedCodes').textContent = stats.usedCodes || 0;
+                document.getElementById('availableCodes').textContent = (stats.totalCodes || 0) - (stats.usedCodes || 0);
+                document.getElementById('usedAccounts').textContent = (stats.totalAccounts || 0) - (stats.availableAccounts || 0);
+                
+                // Create chart
+                if (chart) chart.destroy();
+                
+                const ctx = document.getElementById('statsChart');
+                if (ctx) {
+                    chart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Akun Tersedia', 'Akun Terpakai', 'Kode Tersedia', 'Kode Terpakai'],
+                            datasets: [{
+                                data: [
+                                    stats.availableAccounts || 0,
+                                    (stats.totalAccounts || 0) - (stats.availableAccounts || 0),
+                                    (stats.totalCodes || 0) - (stats.usedCodes || 0),
+                                    stats.usedCodes || 0
+                                ],
+                                backgroundColor: [
+                                    'rgba(76, 201, 240, 0.7)',
+                                    'rgba(247, 37, 133, 0.7)',
+                                    'rgba(67, 97, 238, 0.7)',
+                                    'rgba(248, 150, 30, 0.7)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // ============ EVENT HANDLERS ============
+        function handleProductSelectChange(e) {
+            currentProductId = e.target.value;
+            loadAccounts(currentProductId);
+        }
+
+        function handleCodeProductSelectChange(e) {
+            loadAvailableAccounts(e.target.value);
+        }
+
+        function handleViewCodeProductSelectChange(e) {
+            loadCodes(e.target.value);
+        }
+
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            
+            const productData = {
+                product_code: document.getElementById('productCode').value,
+                name: document.getElementById('productName').value,
+                description: document.getElementById('productDescription').value,
+                logo: document.getElementById('productLogo').value,
+                stock: parseInt(document.getElementById('productStock').value) || 0
+            };
+            
+            const productId = document.getElementById('productId').value;
+            
+            try {
+                let response;
+                if (productId) {
+                    // Update existing product
+                    response = await fetch(`/api/products/${productId}`, {
+                        method: 'PUT',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(productData)
+                    });
+                } else {
+                    // Create new product
+                    response = await fetch('/api/products', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(productData)
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save product');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    showNotification(`Produk ${productId ? 'diupdate' : 'ditambahkan'} berhasil`, 'success');
+                    closeProductModal();
+                    loadProducts();
+                    loadDashboard();
+                }
+                
+            } catch (error) {
+                console.error('Error saving product:', error);
+                showNotification('Gagal menyimpan produk', 'error');
+            }
+        }
+
+        async function handleAccountSubmit(e) {
+            e.preventDefault();
+            
+            const accountData = {
+                product_id: document.getElementById('accountProductId').value,
+                email: document.getElementById('accountEmail').value,
+                password: document.getElementById('accountPassword').value,
+                login_via: document.getElementById('accountLoginVia').value,
+                notes: document.getElementById('accountNotes').value
+            };
+            
+            try {
+                const response = await fetch('/api/accounts', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(productData)
+                    body: JSON.stringify(accountData)
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save account');
+                }
                 
                 const data = await response.json();
                 if (data.success) {
-                    showNotification('Produk berhasil ditambahkan', 'success');
+                    showNotification('Akun berhasil ditambahkan', 'success');
+                    closeAccountModal();
+                    loadAccounts(accountData.product_id);
                     loadProducts();
-                    closeProductModal();
-                } else {
-                    throw new Error(data.error);
+                    loadDashboard();
                 }
+                
             } catch (error) {
-                showNotification('Gagal menambah produk: ' + error.message, 'error');
+                console.error('Error saving account:', error);
+                showNotification('Gagal menyimpan akun', 'error');
             }
         }
 
-        async function updateProduct(id, productData) {
+        async function handleImportSubmit(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('importProductSelect').value;
+            const text = document.getElementById('importText').value;
+            
+            if (!productId) {
+                showNotification('Pilih produk terlebih dahulu', 'error');
+                return;
+            }
+            
             try {
-                const response = await fetch(`/api/products/${id}`, {
-                    method: 'PUT',
+                const response = await fetch('/api/accounts/import', {
+                    method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(productData)
+                    body: JSON.stringify({ product_id: productId, text })
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to import accounts');
+                }
                 
                 const data = await response.json();
                 if (data.success) {
-                    showNotification('Produk berhasil diupdate', 'success');
+                    showNotification(`Berhasil import ${data.imported} akun (${data.failed} gagal)`, 'success');
+                    closeImportModal();
+                    loadAccounts(productId);
                     loadProducts();
-                    closeProductModal();
-                } else {
-                    throw new Error(data.error);
+                    loadDashboard();
                 }
+                
             } catch (error) {
-                showNotification('Gagal mengupdate produk', 'error');
+                console.error('Error importing accounts:', error);
+                showNotification('Gagal import akun', 'error');
             }
+        }
+
+        async function handleGenerateCodeSubmit(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('codeProductSelect').value;
+            const accountId = document.getElementById('accountSelect').value;
+            const customPrefix = document.getElementById('customPrefix').value.trim() || undefined;
+            
+            if (!productId || !accountId) {
+                showNotification('Pilih produk dan akun terlebih dahulu', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/codes/generate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        product_id: productId, 
+                        account_id: accountId, 
+                        custom_prefix: customPrefix 
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to generate code');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    showNotification(`Kode berhasil digenerate: ${data.code}`, 'success');
+                    
+                    // Reset form
+                    document.getElementById('accountSelect').innerHTML = '<option value="">Pilih Akun</option>';
+                    
+                    // Load updated data
+                    loadCodes(productId);
+                    loadDashboard();
+                    
+                    // Ask to copy code
+                    if (confirm(`Kode: ${data.code}\n\nSalin ke clipboard?`)) {
+                        copyToClipboard(data.code);
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error generating code:', error);
+                showNotification('Gagal generate kode', 'error');
+            }
+        }
+
+        async function handleGenerateMultipleSubmit(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('multipleProductSelect').value;
+            const count = parseInt(document.getElementById('codeCount').value);
+            const customPrefix = document.getElementById('multipleCustomPrefix').value.trim() || undefined;
+            
+            if (!productId) {
+                showNotification('Pilih produk terlebih dahulu', 'error');
+                return;
+            }
+            
+            if (count < 1 || count > 50) {
+                showNotification('Jumlah kode harus antara 1-50', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/codes/generate-multiple', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        product_id: productId, 
+                        count: count, 
+                        custom_prefix: customPrefix 
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to generate codes');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    showNotification(`${count} kode berhasil digenerate`, 'success');
+                    
+                    // Load updated data
+                    loadCodes(productId);
+                    loadDashboard();
+                    
+                    // Show codes list
+                    const codesList = data.codes.map(c => c.code).join('\n');
+                    if (confirm(`${count} kode berhasil digenerate!\n\nTampilkan daftar kode?`)) {
+                        alert('Kode yang digenerate:\n\n' + codesList);
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error generating multiple codes:', error);
+                showNotification('Gagal generate kode', 'error');
+            }
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            
+            const message = document.getElementById('chatMessage').value.trim();
+            if (!message) {
+                showNotification('Masukkan pesan terlebih dahulu', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: 'broadcast',
+                        username: 'Admin',
+                        message: message,
+                        role: 'admin'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to send message');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Pesan berhasil dikirim', 'success');
+                    loadMessages();
+                    document.getElementById('chatMessage').value = '';
+                }
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showNotification('Gagal mengirim pesan', 'error');
+            }
+        }
+
+        // ============ MODAL FUNCTIONS ============
+        function openProductModal(productId = null) {
+            const modal = document.getElementById('productModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (productId) {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    title.textContent = 'Edit Produk';
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('productCode').value = product.product_code;
+                    document.getElementById('productName').value = product.name;
+                    document.getElementById('productDescription').value = product.description || '';
+                    document.getElementById('productLogo').value = product.logo || 'fas fa-box';
+                    document.getElementById('productStock').value = product.stock;
+                }
+            } else {
+                title.textContent = 'Tambah Produk Baru';
+                document.getElementById('productForm').reset();
+                document.getElementById('productId').value = '';
+                document.getElementById('productLogo').value = 'fas fa-box';
+                document.getElementById('productStock').value = 0;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+        }
+
+        function openAccountModal(productId = null) {
+            if (!productId) {
+                productId = document.getElementById('productSelect').value;
+                if (!productId) {
+                    showNotification('Pilih produk terlebih dahulu', 'error');
+                    return;
+                }
+            }
+            
+            document.getElementById('accountProductId').value = productId;
+            document.getElementById('accountModal').style.display = 'flex';
+        }
+
+        function closeAccountModal() {
+            document.getElementById('accountModal').style.display = 'none';
+            document.getElementById('accountForm').reset();
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').style.display = 'flex';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+            document.getElementById('importForm').reset();
+        }
+
+        // ============ CRUD OPERATIONS ============
+        function editProduct(id) {
+            openProductModal(id);
         }
 
         async function deleteProduct(id) {
@@ -484,37 +1489,27 @@
                     method: 'DELETE'
                 });
                 
+                if (!response.ok) {
+                    throw new Error('Failed to delete product');
+                }
+                
                 const data = await response.json();
                 if (data.success) {
                     showNotification('Produk berhasil dihapus', 'success');
                     loadProducts();
-                } else {
-                    throw new Error(data.error);
+                    loadDashboard();
+                    
+                    // Reset current product if deleted
+                    if (currentProductId === id) {
+                        currentProductId = null;
+                        document.getElementById('productSelect').value = '';
+                        loadAccounts(null);
+                    }
                 }
-            } catch (error) {
-                showNotification('Gagal menghapus produk', 'error');
-            }
-        }
-
-        async function addAccount(accountData) {
-            try {
-                const response = await fetch('/api/accounts', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(accountData)
-                });
                 
-                const data = await response.json();
-                if (data.success) {
-                    showNotification('Akun berhasil ditambahkan', 'success');
-                    loadAccounts(accountData.product_id);
-                    loadProducts();
-                    closeAccountModal();
-                } else {
-                    throw new Error(data.error);
-                }
             } catch (error) {
-                showNotification('Gagal menambah akun', 'error');
+                console.error('Error deleting product:', error);
+                showNotification('Gagal menghapus produk', 'error');
             }
         }
 
@@ -526,82 +1521,29 @@
                     method: 'DELETE'
                 });
                 
+                if (!response.ok) {
+                    throw new Error('Failed to delete account');
+                }
+                
                 const data = await response.json();
                 if (data.success) {
                     showNotification('Akun berhasil dihapus', 'success');
                     loadAccounts(currentProductId);
                     loadProducts();
-                } else {
-                    throw new Error(data.error);
+                    loadDashboard();
                 }
+                
             } catch (error) {
+                console.error('Error deleting account:', error);
                 showNotification('Gagal menghapus akun', 'error');
             }
         }
 
-        async function generateCodes(productId, count) {
-            try {
-                const response = await fetch('/api/codes/generate', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ product_id: productId, count })
-                });
-                
-                const data = await response.json();
-                if (data.success) {
-                    showNotification(`${count} kode berhasil digenerate`, 'success');
-                    loadCodes(productId);
-                    updateStats();
-                    
-                    // Show codes in alert
-                    alert('Kode yang digenerate:\n\n' + data.codes.join('\n'));
-                } else {
-                    throw new Error(data.error);
-                }
-            } catch (error) {
-                showNotification('Gagal generate kode', 'error');
-            }
-        }
-
-        function editProduct(id) {
-            const product = products.find(p => p.id === id);
-            if (!product) return;
-            
-            document.getElementById('modalTitle').textContent = 'Edit Produk';
-            document.getElementById('productId').value = product.id;
-            document.getElementById('productCode').value = product.product_code;
-            document.getElementById('productName').value = product.name;
-            document.getElementById('productDescription').value = product.description || '';
-            document.getElementById('productStock').value = product.stock;
-            
-            document.getElementById('productModal').style.display = 'flex';
-        }
-
-        function closeProductModal() {
-            document.getElementById('productModal').style.display = 'none';
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            document.getElementById('modalTitle').textContent = 'Tambah Produk Baru';
-        }
-
-        function openAccountModal(productId) {
-            if (!productId) {
-                showNotification('Pilih produk terlebih dahulu', 'error');
-                return;
-            }
-            
-            currentProductId = productId;
-            document.getElementById('accountProductId').value = productId;
-            document.getElementById('accountModal').style.display = 'flex';
-        }
-
-        function closeAccountModal() {
-            document.getElementById('accountModal').style.display = 'none';
-            document.getElementById('accountForm').reset();
-        }
-
+        // ============ UTILITY FUNCTIONS ============
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
+            if (!notification) return;
+            
             notification.textContent = message;
             notification.className = `notification ${type}`;
             notification.style.display = 'flex';
@@ -611,93 +1553,28 @@
             }, 3000);
         }
 
-        // Event Listeners
-        document.getElementById('logoutBtn').addEventListener('click', () => {
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Kode disalin!', 'success');
+            }).catch(err => {
+                console.error('Error copying to clipboard:', err);
+                showNotification('Gagal menyalin kode', 'error');
+            });
+        }
+
+        function logout() {
             localStorage.clear();
             window.location.href = 'index.html';
-        });
+        }
 
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                this.classList.add('active');
-                document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
-            });
-        });
+        // ============ GLOBAL FUNCTIONS (for onclick attributes) ============
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+        window.deleteAccount = deleteAccount;
+        window.copyToClipboard = copyToClipboard;
+        window.openProductModal = openProductModal;
+        window.openAccountModal = openAccountModal;
 
-        document.getElementById('addProductBtn').addEventListener('click', () => {
-            closeProductModal();
-            document.getElementById('productModal').style.display = 'flex';
-        });
-
-        document.getElementById('closeProductModal').addEventListener('click', closeProductModal);
-        document.getElementById('closeAccountModal').addEventListener('click', closeAccountModal);
-
-        document.getElementById('productForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const productData = {
-                product_code: document.getElementById('productCode').value,
-                name: document.getElementById('productName').value,
-                description: document.getElementById('productDescription').value,
-                stock: parseInt(document.getElementById('productStock').value)
-            };
-            
-            const productId = document.getElementById('productId').value;
-            if (productId) {
-                await updateProduct(productId, productData);
-            } else {
-                await addProduct(productData);
-            }
-        });
-
-        document.getElementById('productSelect').addEventListener('change', function() {
-            currentProductId = this.value;
-            loadAccounts(this.value);
-        });
-
-        document.getElementById('addAccountBtn').addEventListener('click', () => {
-            const productId = document.getElementById('productSelect').value;
-            openAccountModal(productId);
-        });
-
-        document.getElementById('accountForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const accountData = {
-                product_id: document.getElementById('accountProductId').value,
-                email: document.getElementById('accountEmail').value,
-                password: document.getElementById('accountPassword').value,
-                login_via: document.getElementById('accountLoginVia').value
-            };
-            
-            await addAccount(accountData);
-        });
-
-        document.getElementById('generateCodeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const productId = document.getElementById('codeProductSelect').value;
-            const count = parseInt(document.getElementById('codeCount').value);
-            
-            if (!productId) {
-                showNotification('Pilih produk terlebih dahulu', 'error');
-                return;
-            }
-            
-            await generateCodes(productId, count);
-        });
-
-        document.getElementById('viewCodeProductSelect').addEventListener('change', function() {
-            loadCodes(this.value);
-        });
-
-        // Load initial data
-        loadProducts();
-        loadAccounts(currentProductId);
-        loadCodes(currentProductId);
     </script>
 </body>
 </html>
