@@ -7,74 +7,86 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--light:#f8f9fa;--dark:#212529;--gray:#6c757d;--border-radius:12px;--box-shadow:0 10px 30px rgba(0,0,0,0.1);--transition:all 0.3s ease}
+        :root{--primary:#4361ee;--primary-dark:#3a56d4;--secondary:#7209b7;--danger:#f72585;--success:#4cc9f0;--warning:#f8961e;--dark:#1a1a2e;--light:#f8f9fa;--gray:#6c757d;--gray-light:#e9ecef;--border-radius:12px;--box-shadow:0 10px 30px rgba(0,0,0,0.1);--transition:all 0.3s ease}
         body{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-        .login-container{width:100%;max-width:420px}
-        .login-card{background:white;border-radius:var(--border-radius);padding:40px;box-shadow:var(--box-shadow);animation:slideUp 0.5s ease-out}
+        .login-container{width:100%;max-width:450px}
+        .login-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:var(--border-radius);padding:40px;box-shadow:var(--box-shadow);animation:slideUp 0.5s ease-out;border:1px solid rgba(255,255,255,0.2)}
         .logo{text-align:center;margin-bottom:30px}
-        .logo i{font-size:3.5rem;color:var(--primary);margin-bottom:15px}
-        .logo h1{color:var(--dark);font-size:1.8rem}
+        .logo i{font-size:3.5rem;color:var(--primary);margin-bottom:15px;background:linear-gradient(45deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .logo h1{color:var(--dark);font-size:2rem;font-weight:700}
+        .logo p{color:var(--gray);margin-top:10px;font-size:0.9rem}
         .form-group{margin-bottom:20px}
-        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark)}
-        input{width:100%;padding:14px 16px;border:2px solid #e9ecef;border-radius:var(--border-radius);font-size:16px;transition:var(--transition)}
+        label{display:block;margin-bottom:8px;font-weight:600;color:var(--dark);font-size:0.9rem}
+        input{width:100%;padding:15px;border:2px solid var(--gray-light);border-radius:var(--border-radius);font-size:16px;transition:var(--transition);background:white}
         input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,97,238,0.2)}
-        .btn{width:100%;padding:14px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px}
-        .btn-primary{background-color:var(--primary);color:white;margin-top:10px}
-        .btn-primary:hover{background-color:var(--primary-dark);transform:translateY(-2px)}
+        .btn{width:100%;padding:15px;border:none;border-radius:var(--border-radius);font-size:16px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:10px}
+        .btn-primary{background:linear-gradient(45deg,var(--primary),var(--secondary));color:white;position:relative;overflow:hidden}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(67,97,238,0.3)}
+        .btn-primary:active{transform:translateY(0)}
         .role-selector{display:flex;gap:10px;margin-bottom:25px}
-        .role-btn{flex:1;padding:12px;border:2px solid #e9ecef;background:white;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center}
-        .role-btn.active{border-color:var(--primary);background-color:rgba(67,97,238,0.1);color:var(--primary)}
-        .error-message{background-color:#fee;color:var(--danger);padding:12px;border-radius:var(--border-radius);margin-top:20px;text-align:center;display:none}
-        .demo-credentials{margin-top:25px;padding:15px;background-color:#f8f9fa;border-radius:var(--border-radius);font-size:0.9rem}
-        .demo-credentials h4{margin-bottom:10px;color:var(--gray)}
-        .demo-credentials p{margin-bottom:5px}
+        .role-btn{flex:1;padding:12px;border:2px solid var(--gray-light);background:white;border-radius:var(--border-radius);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center}
+        .role-btn.active{border-color:var(--primary);background:linear-gradient(45deg,var(--primary),var(--secondary));color:white}
+        .role-btn:hover:not(.active){border-color:var(--primary)}
+        .error-message{background:rgba(247,37,133,0.1);color:var(--danger);padding:12px;border-radius:var(--border-radius);margin-top:20px;text-align:center;display:none;border:1px solid rgba(247,37,133,0.2)}
+        .demo-credentials{margin-top:25px;padding:20px;background:rgba(248,249,250,0.8);border-radius:var(--border-radius);border:1px solid var(--gray-light)}
+        .demo-credentials h4{display:flex;align-items:center;gap:10px;margin-bottom:15px;color:var(--gray)}
+        .credential-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-light)}
+        .credential-item:last-child{border-bottom:none}
+        .credential-role{font-weight:600;color:var(--dark)}
+        .credential-details{color:var(--gray);font-size:0.9rem}
+        .footer{margin-top:25px;text-align:center;color:var(--gray);font-size:0.8rem}
         @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-        @media (max-width:480px){.login-card{padding:30px 20px}}
+        @media(max-width:480px){.login-card{padding:30px 20px}.logo h1{font-size:1.6rem}.role-selector{flex-direction:column}}
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-card">
             <div class="logo">
-                <i class="fas fa-lock"></i>
-                <h1>Account Manager</h1>
-                <p style="color:var(--gray);margin-top:10px">Secure Account Management</p>
+                <i class="fas fa-shield-alt"></i>
+                <h1>Depann Store</h1>
+                <p>Secure Account Management System</p>
             </div>
 
             <div class="role-selector">
                 <button type="button" class="role-btn active" id="userBtn">
-                    <i class="fas fa-user"></i> User
+                    <i class="fas fa-user"></i> User Panel
                 </button>
                 <button type="button" class="role-btn" id="adminBtn">
-                    <i class="fas fa-crown"></i> Admin
+                    <i class="fas fa-crown"></i> Admin Panel
                 </button>
             </div>
 
             <form id="loginForm">
                 <div class="form-group" id="usernameField">
-                    <label for="username"><i class="fas fa-user"></i> Username</label>
-                    <input type="text" id="username" placeholder="Masukkan username" required>
+                    <label for="username"><i class="fas fa-user-circle"></i> Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="password"><i class="fas fa-key"></i> Password</label>
-                    <input type="password" id="password" placeholder="Masukkan password" required>
+                    <input type="password" id="password" placeholder="Enter password" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <i class="fas fa-sign-in-alt"></i> Masuk sebagai User
+                    <i class="fas fa-sign-in-alt"></i> Login as User
                 </button>
             </form>
 
             <div class="error-message" id="errorMessage">
-                Username atau password salah!
+                Invalid credentials. Please try again.
             </div>
 
             <div class="demo-credentials">
-                <h4><i class="fas fa-info-circle"></i> Kredensial:</h4>
-                <p><strong>User:</strong>app</p>
-                <p><strong>Password:</strong>1</p>
-                <p style="font-size:0.8rem;color:var(--gray);margin-top:10px">User tidak perlu username, cukup password: 1</p>
+                <h4><i class="fas fa-info-circle"></i> Account Login</h4>
+                <div class="credential-item">
+                    <span class="credential-role">User</span>
+                    <span class="credential-details">app / 1</span>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>© 2024 Account Manager | Secure by Depann</p>
             </div>
         </div>
     </div>
@@ -93,18 +105,20 @@
             userBtn.classList.add('active');
             adminBtn.classList.remove('active');
             currentRole = 'user';
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk sebagai User';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as User';
             usernameField.style.display = 'block';
             usernameInput.required = false;
+            usernameInput.placeholder = 'Optional username';
         });
 
         adminBtn.addEventListener('click', () => {
             adminBtn.classList.add('active');
             userBtn.classList.remove('active');
             currentRole = 'admin';
-            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk sebagai Admin';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as Admin';
             usernameField.style.display = 'block';
             usernameInput.required = true;
+            usernameInput.placeholder = 'Enter admin username';
         });
 
         loginForm.addEventListener('submit', async function(e) {
@@ -125,6 +139,7 @@
                 if (data.success) {
                     localStorage.setItem('userRole', data.role);
                     localStorage.setItem('username', data.username);
+                    localStorage.setItem('userName', data.name);
                     
                     if (data.role === 'admin') {
                         window.location.href = 'admin.html';
@@ -136,13 +151,18 @@
                     errorMessage.style.display = 'block';
                 }
             } catch (error) {
-                errorMessage.textContent = 'Network error';
+                errorMessage.textContent = 'Network error. Please try again.';
                 errorMessage.style.display = 'block';
             }
         });
 
         usernameInput.addEventListener('input', () => {
             errorMessage.style.display = 'none';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            usernameInput.required = false;
+            usernameInput.placeholder = 'Optional username';
         });
     </script>
 </body>
